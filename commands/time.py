@@ -6,6 +6,7 @@ from logger import log_request  # Import logging function
 
 # Command handler for /time
 async def time_command(update: Update, context: CallbackContext) -> None:
+    print("DEBUG: /time command received")  # Отладочный вывод в консоль
     await log_request(update)  # Log the request
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     reply_markup = get_main_menu()
