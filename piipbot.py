@@ -1,7 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackContext
 
 # Load environment variables
@@ -38,6 +38,12 @@ async def notify_admin(update: Update):
     if ADMIN_ID:
         await update.get_bot().send_message(chat_id=ADMIN_ID, text=message)
 
+# Function to send the command keyboard
+async def send_keyboard(update: Update):
+    keyboard = [["/ip"]]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
+    await update.message.reply_text("Choose a command:", reply_markup=reply_markup)
+
 # Command handler for /ip command
 async def ip_command(update: Update, context: CallbackContext) -> None:
     username = update.message.from_user.username  # Get Telegram username
@@ -57,9 +63,14 @@ async def ip_command(update: Update, context: CallbackContext) -> None:
     ip_address = get_public_ip()
     await update.message.reply_text(f"Your public IP address: {ip_address}")
 
+# Start command handler to show buttons
+async def start_command(update: Update, context: CallbackContext) -> None:
+    await send_keyboard(update)
+
 # Main function to start the bot
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
+    app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("ip", ip_command))
 
     print("Bot is running...")
