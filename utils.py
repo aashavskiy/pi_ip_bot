@@ -1,25 +1,26 @@
 import os
 from telegram import Update
 
-# Load admin ID from environment variables
+# Load admin ID
 ADMIN_ID = os.getenv("ADMIN_ID")
 
-# Debug print to check if ADMIN_ID is loaded correctly
-print(f"Loaded ADMIN_ID: {ADMIN_ID}")
+# Function to check if user is allowed
+def is_user_allowed(update: Update):
+    username = update.message.from_user.username
+    if not username:
+        return False
 
-# Function to notify admin about bot usage
+    # Load whitelisted usernames
+    with open("whitelist.txt", "r") as f:
+        whitelist = {line.strip().lower() for line in f}
+
+    return username.lower() in whitelist
+
+# Function to notify admin
 async def notify_admin(update: Update):
     username = update.message.from_user.username or "Unknown"
     user_id = update.message.from_user.id
 
     message = f"Bot accessed by:\nUsername: @{username}\nUser ID: {user_id}"
-    
-    if not ADMIN_ID:
-        print("ADMIN_ID is missing! Notification not sent.")
-        return
-    
-    try:
+    if ADMIN_ID:
         await update.get_bot().send_message(chat_id=ADMIN_ID, text=message)
-        print("Notification sent to admin.")
-    except Exception as e:
-        print(f"Error sending notification: {e}")
