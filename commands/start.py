@@ -1,8 +1,8 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update
 from telegram.ext import CallbackContext
+from menu import get_main_menu  # Import menu function
 
-# Function to send the command keyboard
+# Command handler for /start
 async def start_command(update: Update, context: CallbackContext) -> None:
-    keyboard = [["/ip", "/start"]]  # Add more commands if needed
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
+    reply_markup = get_main_menu()  # Get the keyboard from menu.py
     await update.message.reply_text("Choose a command:", reply_markup=reply_markup)

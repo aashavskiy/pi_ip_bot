@@ -1,7 +1,8 @@
 import requests
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update
 from telegram.ext import CallbackContext
 from utils import notify_admin, is_user_allowed
+from menu import get_main_menu  # Import menu function
 
 # Function to get the public IP address
 def get_public_ip():
@@ -20,8 +21,6 @@ async def ip_command(update: Update, context: CallbackContext) -> None:
     await notify_admin(update)
     ip_address = get_public_ip()
 
-    # Keep the buttons visible
-    keyboard = [["/ip", "/start"]]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
-
+    # Use the centralized menu
+    reply_markup = get_main_menu()
     await update.message.reply_text(f"Your public IP address: {ip_address}", reply_markup=reply_markup)
