@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = os.getenv("ADMIN_ID")  # Get admin ID from .env
 
 # Whitelist file path
 WHITELIST_FILE = "whitelist.txt"
@@ -28,6 +29,15 @@ def get_public_ip():
     except Exception as e:
         return f"Error retrieving IP: {e}"
 
+# Notify admin when someone accesses the bot
+async def notify_admin(update: Update):
+    username = update.message.from_user.username or "Unknown"
+    user_id = update.message.from_user.id
+
+    message = f"Bot accessed by:\nUsername: @{username}\nUser ID: {user_id}"
+    if ADMIN_ID:
+        await update.get_bot().send_message(chat_id=ADMIN_ID, text=message)
+
 # Command handler for /ip command
 async def ip_command(update: Update, context: CallbackContext) -> None:
     username = update.message.from_user.username  # Get Telegram username
@@ -40,6 +50,10 @@ async def ip_command(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("Access denied.")
         return
 
+    # Notify admin about access
+    await notify_admin(update)
+
+    # Get public IP
     ip_address = get_public_ip()
     await update.message.reply_text(f"Your public IP address: {ip_address}")
 
