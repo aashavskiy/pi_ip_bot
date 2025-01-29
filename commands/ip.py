@@ -6,7 +6,7 @@ from menu import get_main_menu  # Import menu function
 # Keenetic router settings
 KEENETIC_IP = "192.168.1.1"  # Или реальный IP, если доступен снаружи
 USERNAME = "guest"  # Логин от роутера
-PASSWORD = "ydwb8tkc_EPJ*pdr@ubn"  # Пароль
+PASSWORD = "test"  # Пароль
 
 def get_keenetic_ip():
     try:
