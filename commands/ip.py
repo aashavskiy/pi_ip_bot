@@ -1,8 +1,8 @@
 import requests
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import notify_admin, is_user_allowed
 from menu import get_main_menu  # Import menu function
+from logger import log_request  # Import logging function
 
 # Function to get the public IP address
 def get_public_ip():
@@ -14,13 +14,7 @@ def get_public_ip():
 
 # Command handler for /ip
 async def ip_command(update: Update, context: CallbackContext) -> None:
-    if not is_user_allowed(update):
-        await update.message.reply_text("Access denied.")
-        return
-
-    await notify_admin(update)
+    await log_request(update)  # Log the request
     ip_address = get_public_ip()
-
-    # Use the centralized menu
     reply_markup = get_main_menu()
     await update.message.reply_text(f"Your public IP address: {ip_address}", reply_markup=reply_markup)
