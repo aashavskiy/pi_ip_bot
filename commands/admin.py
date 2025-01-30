@@ -1,45 +1,21 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 from utils import add_to_whitelist, load_whitelist
-import os
 
-ADMIN_ID = os.getenv("ADMIN_ID")
+BOT_WHITELIST_FILE = "bot_whitelist.txt"
 
-# Function to handle admin approvals via inline buttons
 async def handle_approval(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
-    await query.answer()  # Acknowledge button press
+    await query.answer()
 
-    callback_data = query.data
-    message_text = query.message.text or ""
+    callback_data = query.data.split("_")
+    action = callback_data[1]
+    user_id = callback_data[2]
+    username = callback_data[3] if action == "approve" else None
 
-    # Log the actual message format for debugging
-    print(f"DEBUG: Received message text -> {message_text}")
-
-    message_lines = message_text.split("\n")
-    print(f"DEBUG: Message lines -> {message_lines}")
-
-    if callback_data.startswith("approve_"):
-        user_id = callback_data.split("_")[1]
-
-        # Ensure we have enough lines to extract username
-        if len(message_lines) < 4:
-            await query.message.reply_text("❌ Error: Unable to extract username. Message format is incorrect.")
-            return
-
-        username_line = message_lines[2]  # Third line contains username
-        print(f"DEBUG: Username line -> {username_line}")
-
-        if "Username: " not in username_line:
-            await query.message.reply_text("❌ Error: Username format is incorrect.")
-            return
-
-        username = username_line.split("Username: ")[1].strip()
-        print(f"DEBUG: Extracted username -> {username}")
-
-        add_to_whitelist(user_id, username)
-        await query.edit_message_text(f"✅ User {username} ({user_id}) has been added to the whitelist.")
-    
-    elif callback_data.startswith("deny_"):
-        user_id = callback_data.split("_")[1]
+    if action == "approve":
+        add_to_whitelist(user_id, username, BOT_WHITELIST_FILE)
+        await query.edit_message_text(f"✅ User @{username} ({user_id}) has been approved to use the bot.")
+        await context.bot.send_message(chat_id=user_id, text="🎉 You have been approved! Use /menu to see available commands.")
+    else:
         await query.edit_message_text(f"❌ User {user_id} was denied access.")
