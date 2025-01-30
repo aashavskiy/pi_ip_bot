@@ -68,7 +68,7 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))  # ✅ Ensure callback is registered
 
     # Add VPN-related handlers
-    from commands.vpn import request_vpn, add_device, list_devices, remove_device
+    from commands.vpn import request_vpn, add_device, list_devices, remove_device, get_config
     app.add_handler(CommandHandler("vpn", request_vpn))
     app.add_handler(CommandHandler("adddevice", add_device))
     app.add_handler(CommandHandler("listdevices", list_devices))
