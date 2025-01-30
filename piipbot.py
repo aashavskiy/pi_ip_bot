@@ -1,7 +1,8 @@
 import os
 import importlib
 from dotenv import load_dotenv
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from commands.admin import handle_approval
 
 # Load environment variables
 load_dotenv()
@@ -22,11 +23,6 @@ def load_commands():
 
     return commands
 
-from commands.admin import handle_approval
-
-# Approve handler function
-app.add_handler(CallbackQueryHandler(handle_approval))
-
 # Main function to start the bot
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
@@ -36,6 +32,9 @@ def main():
     for cmd_name, cmd_func in commands.items():
         app.add_handler(CommandHandler(cmd_name, cmd_func))
         print(f"Loaded command: /{cmd_name}")
+
+    # Add inline button handler for approving new users
+    app.add_handler(CallbackQueryHandler(handle_approval))
 
     print("Bot is running...")
     app.run_polling()
