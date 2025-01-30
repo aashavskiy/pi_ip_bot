@@ -2,6 +2,7 @@ import os
 import importlib
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from utils import load_whitelist
 from commands.admin import handle_approval
 from commands.vpn import handle_vpn_approval  # VPN approval handler
 
@@ -11,6 +12,21 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 if not BOT_TOKEN:
     raise ValueError("❌ ERROR: BOT_TOKEN is not set in .env!")
+
+# Load whitelists
+BOT_WHITELIST_FILE = "bot_whitelist.txt"
+BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)
+
+# Function to check if a user is authorized
+async def check_whitelist(update):
+    user_id = str(update.message.from_user.id)
+    
+    if user_id not in BOT_WHITELIST:
+        await update.message.reply_text("🚫 You are not authorized to use this bot.")
+        print(f"🚨 Unauthorized access attempt: {update.message.from_user.username} ({user_id})")
+        return False  # ⛔ Stop execution if not whitelisted
+    
+    return True  # ✅ Allow execution if whitelisted
 
 # Function to dynamically load command handlers from the "commands" folder
 def load_commands():
@@ -34,7 +50,11 @@ def main():
     # Dynamically load all command handlers
     commands = load_commands()
     for cmd_name, cmd_func in commands.items():
-        app.add_handler(CommandHandler(cmd_name, cmd_func))
+        async def wrapped_func(update, context, func=cmd_func):
+            if await check_whitelist(update):  # Enforce whitelist
+                await func(update, context)
+
+        app.add_handler(CommandHandler(cmd_name, wrapped_func))
         print(f"✅ Loaded command: /{cmd_name}")
 
     # Add admin approval handler (for bot access)
