@@ -69,7 +69,8 @@ def main():
 
     # Add VPN-related handlers
     from commands.admin import handle_approval
-    from commands.vpn import request_vpn, handle_vpn_approval, add_device, list_devices, remove_device, get_config
+    from commands.vpn.approval import handle_vpn_approval  # ✅ Direct import from approval.py
+    from commands.vpn import request_vpn, add_device, list_devices, remove_device, get_config
 
     app.add_handler(CommandHandler("vpn", request_vpn))
     app.add_handler(CommandHandler("adddevice", add_device))
@@ -77,7 +78,6 @@ def main():
     app.add_handler(CommandHandler("removedevice", remove_device))
     app.add_handler(CommandHandler("getconfig", get_config))
     app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))  # ✅ Fixed import
-
     # Register the menu command
     app.add_handler(CommandHandler("menu", menu_command))
 
