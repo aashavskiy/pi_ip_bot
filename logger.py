@@ -5,7 +5,7 @@ from utils import load_whitelist
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 
 # Log user requests
-def log_request(user_id, username, command):
+async def log_request(user_id, username, command):  # ✅ Made async to match await call
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"[{timestamp}] {username} ({user_id}) used: {command}\n"
 
