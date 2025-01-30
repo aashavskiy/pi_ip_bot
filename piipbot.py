@@ -73,7 +73,7 @@ def main():
     app.add_handler(CommandHandler("adddevice", add_device))
     app.add_handler(CommandHandler("listdevices", list_devices))
     app.add_handler(CommandHandler("removedevice", remove_device))
-    app.add_handler(CommandHandler("getconfig", get_config, pass_args=True))
+    app.add_handler(CommandHandler("getconfig", get_config))
     app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))
 
     # Register the menu command
