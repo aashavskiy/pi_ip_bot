@@ -65,7 +65,7 @@ def main():
         print(f"✅ Loaded command: /{cmd_name}")
 
     # Add admin approval handler (for bot access)
-    app.add_handler(CallbackQueryHandler(handle_approval))
+    app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))  # ✅ Ensure callback is registered
 
     # Add VPN-related handlers
     from commands.vpn import request_vpn, add_device, list_devices, remove_device
