@@ -1,6 +1,7 @@
 import os
 from telegram import Update
 from telegram.ext import CallbackContext
+from commands.vpn.config import generate_vpn_config
 from utils import load_whitelist
 
 VPN_CONFIG_DIR = "/etc/wireguard/clients/"
