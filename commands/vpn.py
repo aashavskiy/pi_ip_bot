@@ -84,10 +84,47 @@ AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 25
 """
 
-    with open(config_path, "w") as f:
-        f.write(config_content)
+    try:
+        with open(config_path, "w") as f:
+            f.write(config_content)
 
-    await update.message.reply_text(f"✅ VPN configuration generated: `{config_path}`")
+        # ✅ Ensure correct file permissions so the bot can read it
+        os.chmod(config_path, 0o644)
+
+        await update.message.reply_text(f"✅ VPN configuration generated: `{config_path}`")
+
+        # ✅ Open file and send it to the user
+        with open(config_path, "rb") as file:
+            await context.bot.send_document(chat_id=user_id, document=file, filename=f"{device_name}.conf")
+
+    except Exception as e:
+        await update.message.reply_text("❌ Error: Failed to generate VPN configuration.")
+        print(f"ERROR: Failed to send VPN config - {e}")  # ✅ Log the error
+
+async def get_config(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or "Unknown"
+
+    vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
+
+    # ✅ Check if user is approved for VPN
+    if user_id not in vpn_whitelist:
+        await update.message.reply_text("🚫 You are not authorized to retrieve VPN configurations.")
+        return
+
+    args = context.args
+    if not args:
+        await update.message.reply_text("❌ Usage: `/getconfig <device_name>`")
+        return
+
+    device_name = args[0]
+    config_path = os.path.join(VPN_CONFIG_DIR, f"{device_name}.conf")
+
+    if os.path.exists(config_path):
+        with open(config_path, "rb") as file:
+            await context.bot.send_document(chat_id=user_id, document=file, filename=f"{device_name}.conf")
+    else:
+        await update.message.reply_text("❌ Device configuration not found.")
 
 async def list_devices(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
