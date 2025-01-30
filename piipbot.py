@@ -2,38 +2,13 @@ import os
 import importlib
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
-from utils import load_whitelist
 from commands.admin import handle_approval
-from commands.vpn import handle_vpn_approval  # VPN approval handler
-from commands.menu import menu_command  # Import the dynamic menu command
+from commands.vpn import request_vpn, add_device, list_devices, remove_device, get_config
+from commands.vpn.approval import handle_vpn_approval  # ✅ Import directly from approval.py
 
 # Load environment variables
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-if not BOT_TOKEN:
-    raise ValueError("❌ ERROR: BOT_TOKEN is not set in .env!")
-
-# Whitelist settings
-BOT_WHITELIST_FILE = "bot_whitelist.txt"
-VPN_WHITELIST_FILE = "vpn_whitelist.txt"
-BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)  # ✅ Load bot access whitelist
-VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)  # ✅ Load VPN access whitelist
-
-# Function to check if a user is authorized
-async def check_whitelist(update):
-    user_id = str(update.message.from_user.id)
-    
-    # 🔄 Reload whitelist on each request to detect newly approved users
-    global BOT_WHITELIST
-    BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)
-
-    if user_id not in BOT_WHITELIST:
-        await update.message.reply_text("🚫 You are not authorized to use this bot.")
-        print(f"🚨 Unauthorized access attempt: {update.message.from_user.username} ({user_id})")
-        return False  # ⛔ Stop execution if not whitelisted
-    
-    return True  # ✅ Allow execution if whitelisted
 
 # Function to dynamically load command handlers from the "commands" folder
 def load_commands():
@@ -57,31 +32,18 @@ def main():
     # Dynamically load all command handlers
     commands = load_commands()
     for cmd_name, cmd_func in commands.items():
-        async def wrapped_func(update, context, func=cmd_func):
-            if await check_whitelist(update):  # Enforce whitelist
-                await func(update, context)
-
-        app.add_handler(CommandHandler(cmd_name, wrapped_func))
+        app.add_handler(CommandHandler(cmd_name, cmd_func))
         print(f"✅ Loaded command: /{cmd_name}")
 
-    # Add admin approval handler (for bot access)
-    app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))  # ✅ Ensure callback is registered
-
-    # Add VPN-related handler
-    from commands.admin import handle_approval
-    from commands.vpn import request_vpn, handle_vpn_approval, add_device, list_devices, remove_device, get_config  # ✅ Fixed import
-
+    # Add VPN-specific handlers
     app.add_handler(CommandHandler("vpn", request_vpn))
     app.add_handler(CommandHandler("adddevice", add_device))
     app.add_handler(CommandHandler("listdevices", list_devices))
     app.add_handler(CommandHandler("removedevice", remove_device))
     app.add_handler(CommandHandler("getconfig", get_config))
-    app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))  # ✅ Fixed import
 
-
-
-    # Register the menu command
-    app.add_handler(CommandHandler("menu", menu_command))
+    # Add inline button handler for VPN approval
+    app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))
 
     print("🤖 Bot is running...")
     app.run_polling()
