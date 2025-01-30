@@ -1,30 +1,24 @@
 import os
 import subprocess
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 from utils import load_whitelist, add_to_whitelist
 
 VPN_WHITELIST_FILE = "vpn_whitelist.txt"
 VPN_CONFIG_DIR = "/etc/wireguard/clients/"
-SERVER_PUBLIC_KEY_PATH = "/etc/wireguard/server_public.key"
-SERVER_HOSTNAME = "ashavskiy.keenetic.name"
-WG_INTERFACE = "wg0"
-BASE_CLIENT_IP = "10.0.0."
 
-# Ensure VPN directory exists
-if not os.path.exists(VPN_CONFIG_DIR):
-    os.makedirs(VPN_CONFIG_DIR, exist_ok=True)
-
-# Request VPN Access
 async def request_vpn(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "Unknown"
+    
+    vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
 
-    if user_id in load_whitelist(VPN_WHITELIST_FILE):
+    # ✅ If user is already in the VPN whitelist, prevent duplicate requests
+    if user_id in vpn_whitelist:
         await update.message.reply_text("✅ You are already approved for VPN access.")
         return
-
-    # Send request to admin
+    
+    # Send request to admin for approval
     keyboard = [
         [
             InlineKeyboardButton("✅ Approve", callback_data=f"vpn_approve_{user_id}_{username}"),
@@ -33,92 +27,98 @@ async def request_vpn(update: Update, context: CallbackContext) -> None:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text(f"🚨 New VPN request!\n\nUsername: @{username}\nUser ID: {user_id}", reply_markup=reply_markup)
+    # Send request message to admin
+    admin_id = context.bot_data.get("ADMIN_ID")
+    if admin_id:
+        message = f"🚨 New VPN request!\n\nUsername: @{username}\nUser ID: {user_id}"
+        await context.bot.send_message(chat_id=admin_id, text=message, reply_markup=reply_markup)
+    
+    # Confirm request to user
+    await update.message.reply_text("🔄 Your request for VPN access has been sent to the admin.")
 
-# Admin approval callback
 async def handle_vpn_approval(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     await query.answer()
 
-    data = query.data.split("_")
-    action, user_id = data[1], data[2]
-    username = data[3] if action == "approve" else None
+    callback_data = query.data.split("_")
+    action = callback_data[1]
+    user_id = callback_data[2]
+    username = callback_data[3] if action == "approve" else None
 
     if action == "approve":
-        add_to_whitelist(user_id, username, VPN_WHITELIST_FILE)
-        config_path = generate_vpn_config(username, 1)
-        await query.edit_message_text(f"✅ User @{username} ({user_id}) approved for VPN access.")
-        await context.bot.send_document(chat_id=user_id, document=open(config_path, "rb"), filename=f"{username}_wireguard.conf")
+        add_to_whitelist(user_id, username, VPN_WHITELIST_FILE)  # ✅ Ensure user is saved in VPN whitelist
+        await query.edit_message_text(f"✅ User @{username} ({user_id}) has been approved for VPN access.")
+        await context.bot.send_message(chat_id=user_id, text="🎉 You have been approved for VPN access! Use /menu to see VPN commands.")
     else:
         await query.edit_message_text(f"❌ User {user_id} was denied VPN access.")
 
-# Generate WireGuard Configuration
-def generate_vpn_config(username, device_number):
-    user_private_key = subprocess.check_output("wg genkey", shell=True).decode().strip()
-    user_public_key = subprocess.check_output(f"echo {user_private_key} | wg pubkey", shell=True).decode().strip()
-    server_public_key = open(SERVER_PUBLIC_KEY_PATH).read().strip()
+async def add_device(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or "Unknown"
 
-    # Find next available IP
-    client_ip = f"{BASE_CLIENT_IP}{device_number}/24"
+    vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
 
-    config_filename = f"{username}_{device_number}.conf"
-    config_path = os.path.join(VPN_CONFIG_DIR, config_filename)
+    # ✅ Check if user is approved for VPN
+    if user_id not in vpn_whitelist:
+        await update.message.reply_text("🚫 You are not authorized to add VPN devices.")
+        return
 
-    config_data = f"""
-[Interface]
-PrivateKey = {user_private_key}
-Address = {client_ip}
-DNS = 8.8.8.8
+    device_name = f"{username}_device"
+    config_path = os.path.join(VPN_CONFIG_DIR, f"{device_name}.conf")
+
+    # Generate VPN config
+    config_content = f"""[Interface]
+PrivateKey = YOUR_PRIVATE_KEY
+Address = 10.0.0.2/24
+DNS = 1.1.1.1
 
 [Peer]
-PublicKey = {server_public_key}
-Endpoint = {SERVER_HOSTNAME}:51820
+PublicKey = YOUR_SERVER_PUBLIC_KEY
+Endpoint = YOUR_SERVER_IP:51820
 AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 25
 """
 
     with open(config_path, "w") as f:
-        f.write(config_data)
+        f.write(config_content)
 
-    subprocess.run(f"sudo wg set {WG_INTERFACE} peer {user_public_key} allowed-ips {client_ip.split('/')[0]}/32", shell=True)
+    await update.message.reply_text(f"✅ VPN configuration generated: `{config_path}`")
 
-    return config_path
-
-# Add an Additional Device
-async def add_device(update: Update, context: CallbackContext) -> None:
-    user_id = str(update.message.from_user.id)
-    username = update.message.from_user.username or "Unknown"
-
-    if user_id not in load_whitelist(VPN_WHITELIST_FILE):
-        await update.message.reply_text("🚫 You do not have VPN access.")
-        return
-
-    device_count = len([f for f in os.listdir(VPN_CONFIG_DIR) if f.startswith(username)]) + 1
-    config_path = generate_vpn_config(username, device_count)
-
-    await update.message.reply_text(f"✅ Added new device configuration for @{username}.")
-    await update.message.reply_document(document=open(config_path, "rb"), filename=f"{username}_{device_count}_wireguard.conf")
-
-# List Current Devices
 async def list_devices(update: Update, context: CallbackContext) -> None:
-    username = update.message.from_user.username or "Unknown"
-    devices = [f for f in os.listdir(VPN_CONFIG_DIR) if f.startswith(username)]
+    user_id = str(update.message.from_user.id)
+    vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
 
-    if not devices:
-        await update.message.reply_text("🔍 No VPN configurations found for you.")
+    # ✅ Check if user is approved for VPN
+    if user_id not in vpn_whitelist:
+        await update.message.reply_text("🚫 You are not authorized to list VPN devices.")
         return
 
-    device_list = "\n".join(devices)
-    await update.message.reply_text(f"🖥 Your VPN Configurations:\n{device_list}")
+    devices = os.listdir(VPN_CONFIG_DIR)
+    if devices:
+        device_list = "\n".join(devices)
+        await update.message.reply_text(f"📄 Your VPN devices:\n```\n{device_list}\n```", parse_mode="Markdown")
+    else:
+        await update.message.reply_text("📂 No VPN devices found.")
 
-# Remove a Device Configuration
 async def remove_device(update: Update, context: CallbackContext) -> None:
-    username = update.message.from_user.username or "Unknown"
-    devices = [f for f in os.listdir(VPN_CONFIG_DIR) if f.startswith(username)]
+    user_id = str(update.message.from_user.id)
+    vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
 
-    if not devices:
-        await update.message.reply_text("🔍 No VPN configurations found for you.")
+    # ✅ Check if user is approved for VPN
+    if user_id not in vpn_whitelist:
+        await update.message.reply_text("🚫 You are not authorized to remove VPN devices.")
         return
 
-    os.remove(os.path.join(VPN_CONFIG_DIR, devices[-1]))
-    await update.message.reply_text(f"🗑 Removed latest device configuration for @{username}.")
+    args = context.args
+    if not args:
+        await update.message.reply_text("❌ Usage: `/removedevice <device_name>`")
+        return
+
+    device_name = args[0]
+    config_path = os.path.join(VPN_CONFIG_DIR, f"{device_name}.conf")
+
+    if os.path.exists(config_path):
+        os.remove(config_path)
+        await update.message.reply_text(f"✅ VPN device `{device_name}` has been removed.")
+    else:
+        await update.message.reply_text("❌ Device not found.")
