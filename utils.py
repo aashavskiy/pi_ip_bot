@@ -1,20 +1,17 @@
 import os
-from telegram import Update
 
-WHITELIST_FILE = "whitelist.txt"
-ADMIN_ID = os.getenv("ADMIN_ID")
+VPN_WHITELIST_FILE = "vpn_whitelist.txt"
 
-# Function to load whitelisted user IDs
-def load_whitelist():
-    if not os.path.exists(WHITELIST_FILE):
+# Load whitelist from file
+def load_whitelist(filename):
+    if not os.path.exists(filename):
         return set()
-    with open(WHITELIST_FILE, "r") as f:
-        return {line.split("#")[0].strip() for line in f if line.strip() and not line.startswith("#")}
+    with open(filename, "r") as f:
+        return set(f.read().splitlines())
 
-WHITELIST = load_whitelist()
-
-# Function to add a new user to whitelist with a comment (username)
-def add_to_whitelist(user_id, username="Unknown"):
-    WHITELIST.add(str(user_id))
-    with open(WHITELIST_FILE, "a") as f:
-        f.write(f"{user_id}  # {username}\n")
+# Add a user to the whitelist
+def add_to_whitelist(user_id, username, filename):
+    whitelist = load_whitelist(filename)
+    whitelist.add(f"{user_id}#{username}")  # Store as `user_id#username`
+    with open(filename, "w") as f:
+        f.write("\n".join(whitelist))
