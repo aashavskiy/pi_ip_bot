@@ -1,14 +1,13 @@
 import os
 
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
-VPN_WHITELIST_FILE = "vpn_whitelist.txt"
 
-# Load a whitelist from a file
+# Load whitelist from file
 def load_whitelist(filename):
     if not os.path.exists(filename):
         return set()
     with open(filename, "r") as f:
-        return set(f.read().splitlines())
+        return {line.split("#")[0].strip() for line in f.read().splitlines()}  # ✅ Store only user IDs
 
 # Add a user to a specific whitelist
 def add_to_whitelist(user_id, username, filename):

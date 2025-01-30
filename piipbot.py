@@ -13,14 +13,18 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise ValueError("❌ ERROR: BOT_TOKEN is not set in .env!")
 
-# Load whitelists
+# Whitelist settings
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
-BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)
+BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)  # ✅ Load whitelist at startup
 
 # Function to check if a user is authorized
 async def check_whitelist(update):
     user_id = str(update.message.from_user.id)
     
+    # 🔄 Reload whitelist on each request to detect newly approved users
+    global BOT_WHITELIST
+    BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)
+
     if user_id not in BOT_WHITELIST:
         await update.message.reply_text("🚫 You are not authorized to use this bot.")
         print(f"🚨 Unauthorized access attempt: {update.message.from_user.username} ({user_id})")
