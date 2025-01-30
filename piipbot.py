@@ -22,6 +22,11 @@ def load_commands():
 
     return commands
 
+from commands.admin import handle_approval
+
+# Approve handler function
+app.add_handler(CallbackQueryHandler(handle_approval))
+
 # Main function to start the bot
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
