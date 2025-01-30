@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import add_to_whitelist, WHITELIST
+from utils import add_to_whitelist, load_whitelist
 import os
 
 ADMIN_ID = os.getenv("ADMIN_ID")
