@@ -9,7 +9,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
     vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
 
     # Basic buttons for all users
-    buttons = [["/ip", "/uptime"], ["/vpn"]]
+    buttons = [["/ip", "/uptime"], ["/vpn"]]  # ✅ Ensure `/vpn` is always visible
 
     # Show additional VPN commands only to whitelisted users
     if user_id in vpn_whitelist:
