@@ -5,6 +5,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler
 from utils import load_whitelist
 from commands.admin import handle_approval
 from commands.vpn import handle_vpn_approval  # VPN approval handler
+from commands.menu import menu_command  # Import the dynamic menu command
 
 # Load environment variables
 load_dotenv()
@@ -15,7 +16,9 @@ if not BOT_TOKEN:
 
 # Whitelist settings
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
-BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)  # ✅ Load whitelist at startup
+VPN_WHITELIST_FILE = "vpn_whitelist.txt"
+BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)  # ✅ Load bot access whitelist
+VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)  # ✅ Load VPN access whitelist
 
 # Function to check if a user is authorized
 async def check_whitelist(update):
@@ -71,6 +74,9 @@ def main():
     app.add_handler(CommandHandler("listdevices", list_devices))
     app.add_handler(CommandHandler("removedevice", remove_device))
     app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))
+
+    # Register the menu command
+    app.add_handler(CommandHandler("menu", menu_command))
 
     print("🤖 Bot is running...")
     app.run_polling()
