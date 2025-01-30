@@ -13,7 +13,7 @@ async def request_vpn(update: Update, context: CallbackContext) -> None:
     
     vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
 
-    # ✅ If user is already in the VPN whitelist, prevent duplicate requests
+    # ✅ Prevent duplicate VPN requests
     if user_id in vpn_whitelist:
         await update.message.reply_text("✅ You are already approved for VPN access.")
         return
@@ -28,7 +28,7 @@ async def request_vpn(update: Update, context: CallbackContext) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     # Send request message to admin
-    admin_id = context.bot_data.get("ADMIN_ID")
+    admin_id = os.getenv("ADMIN_ID")
     if admin_id:
         message = f"🚨 New VPN request!\n\nUsername: @{username}\nUser ID: {user_id}"
         await context.bot.send_message(chat_id=admin_id, text=message, reply_markup=reply_markup)
@@ -47,6 +47,11 @@ async def handle_vpn_approval(update: Update, context: CallbackContext) -> None:
 
     if action == "approve":
         add_to_whitelist(user_id, username, VPN_WHITELIST_FILE)  # ✅ Ensure user is saved in VPN whitelist
+
+        # ✅ Reload whitelist dynamically
+        global VPN_WHITELIST
+        VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)
+
         await query.edit_message_text(f"✅ User @{username} ({user_id}) has been approved for VPN access.")
         await context.bot.send_message(chat_id=user_id, text="🎉 You have been approved for VPN access! Use /menu to see VPN commands.")
     else:
