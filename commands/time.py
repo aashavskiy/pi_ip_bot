@@ -1,13 +1,13 @@
-from datetime import datetime
 from telegram import Update
 from telegram.ext import CallbackContext
-from menu import get_main_menu
-from logger import log_request  # Import logging function
+from datetime import datetime
+from logger import log_request
 
-# Command handler for /time
 async def time_command(update: Update, context: CallbackContext) -> None:
-    print("DEBUG: /time command received")  # Отладочный вывод в консоль
-    await log_request(update)  # Log the request
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or "Unknown"
+
+    await log_request(user_id, username, "/time")  # ✅ Now passing all required arguments
+
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    reply_markup = get_main_menu()
-    await update.message.reply_text(f"Current time: {current_time}", reply_markup=reply_markup)
+    await update.message.reply_text(f"⏰ Current server time: `{current_time}`", parse_mode="Markdown")

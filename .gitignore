@@ -1,3 +1,10 @@
 .env
 __pycache__/
 myvenv
+whitelist.txt
+update.log
+bot_whitelist.txt
+vpn_whitelist.txt
+bot_requests.log
+vpn_whitelist.txt
+vpn_whitelist.txt
