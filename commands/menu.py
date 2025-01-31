@@ -44,6 +44,7 @@ async def start_command(update: Update, context: CallbackContext) -> None:
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     text = update.message.text.strip()
+    logging.info(f"DEBUG: Button pressed -> {text}")
     
     if text == "/start":
         await start_command(update, context)
