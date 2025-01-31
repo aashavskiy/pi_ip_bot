@@ -48,3 +48,6 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await menu_command(update, context)
     else:
         await update.message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
+
+menu_handler = menu_command
+vpn_menu_handler = vpn_menu
