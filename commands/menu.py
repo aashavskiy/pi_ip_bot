@@ -1,42 +1,30 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import CallbackContext
+import logging
+from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
+from telegram.ext import CallbackContext, MessageHandler, filters
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
-    """Displays an inline button menu in the chat instead of the standard Telegram menu."""
-    
     keyboard = [
-        [InlineKeyboardButton("🚀 Start", callback_data="cmd_start")],
-        [InlineKeyboardButton("📡 Get IP", callback_data="cmd_ip")],
-        [InlineKeyboardButton("🕒 Time", callback_data="cmd_time"),
-         InlineKeyboardButton("📊 Uptime", callback_data="cmd_uptime")],
-        [InlineKeyboardButton("🌦 Weather", callback_data="cmd_weather")],
-        [InlineKeyboardButton("🔑 VPN Menu", callback_data="cmd_vpn")],
-        [InlineKeyboardButton("❌ End", callback_data="cmd_end")],
+        [KeyboardButton("/ip")],
+        [KeyboardButton("/uptime")],
+        [KeyboardButton("/vpn")],
+        [KeyboardButton("/end")]
     ]
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("🔽 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
+    await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    """Handles button presses from the menu."""
-    query = update.callback_query
-    await query.answer()
-
-    command_mapping = {
-        "cmd_start": "/start",
-        "cmd_ip": "/ip",
-        "cmd_time": "/time",
-        "cmd_uptime": "/uptime",
-        "cmd_weather": "/weather",
-        "cmd_vpn": "/vpn",
-        "cmd_end": "/end",
-    }
-
-    command = command_mapping.get(query.data)
+    text = update.message.text.strip()
     
-    if command:
-        if command == "/end":
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="👋 **Goodbye!** Closing the menu.", parse_mode="Markdown")
-        else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=f"⌛ Executing `{command}`...", parse_mode="Markdown")
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=command)
+    if text == "/ip":
+        from commands.ip import ip_command
+        await ip_command(update, context)
+    elif text == "/uptime":
+        from commands.uptime import uptime_command
+        await uptime_command(update, context)
+    elif text == "/vpn":
+        from commands.vpn.request import request_vpn
+        await request_vpn(update, context)
+    elif text == "/end":
+        await update.message.reply_text("👋 Goodbye! Menu closed.")

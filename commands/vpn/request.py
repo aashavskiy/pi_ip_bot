@@ -1,32 +1,24 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
+from utils import VPN_WHITELIST, add_to_vpn_whitelist
 import os
-from utils import load_whitelist
 
-VPN_WHITELIST_FILE = "vpn_whitelist.txt"
+ADMIN_ID = os.getenv("ADMIN_ID")
 
 async def request_vpn(update: Update, context: CallbackContext) -> None:
+    """Handle user VPN access requests."""
     user_id = str(update.message.from_user.id)
-    username = update.message.from_user.username or "Unknown"
+    username = update.message.from_user.username or f"User_{user_id}"
 
-    vpn_whitelist = load_whitelist(VPN_WHITELIST_FILE)
-
-    # ✅ Prevent duplicate VPN requests
-    if user_id in vpn_whitelist:
-        await update.message.reply_text("✅ You are already approved for VPN access.")
+    if user_id in VPN_WHITELIST:
+        await update.message.reply_text("✅ You already have VPN access.")
         return
 
-    # Send request to admin for approval
-    keyboard = [[
-        InlineKeyboardButton("✅ Approve", callback_data=f"vpn_approve_{user_id}_{username}"),
-        InlineKeyboardButton("❌ Deny", callback_data=f"vpn_deny_{user_id}")
-    ]]
+    keyboard = [
+        [InlineKeyboardButton("✅ Approve", callback_data=f"vpn_approve_{user_id}_{username}")],
+        [InlineKeyboardButton("❌ Deny", callback_data=f"vpn_deny_{user_id}")]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Send request message to admin
-    admin_id = os.getenv("ADMIN_ID")
-    if admin_id:
-        message = f"🚨 New VPN request!\n\nUsername: @{username}\nUser ID: {user_id}"
-        await context.bot.send_message(chat_id=admin_id, text=message, reply_markup=reply_markup)
-
-    await update.message.reply_text("🔄 Your request for VPN access has been sent to the admin.")
+    await context.bot.send_message(chat_id=ADMIN_ID, text=f"🚨 New VPN request!\n\nUsername: @{username}\nUser ID: {user_id}", reply_markup=reply_markup)
+    await update.message.reply_text("📨 VPN request sent to the admin. Please wait for approval.")
