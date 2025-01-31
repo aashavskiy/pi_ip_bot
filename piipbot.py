@@ -7,7 +7,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval
 from commands.menu import menu_command, handle_menu_buttons  # Ensure menu functions are imported
-from commands.vpn.menu import vpn_menu  # Import VPN menu
+from commands import menu as vpn_menu  # Import VPN menu
 
 # Load environment variables
 load_dotenv()

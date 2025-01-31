@@ -2,7 +2,11 @@ import os
 import subprocess
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import VPN_WHITELIST_FILE, load_whitelist, save_whitelist
+from utils import VPN_WHITELIST_FILE, load_whitelist
+
+def save_whitelist(filename, data):
+    with open(filename, "a") as file:
+        file.write(data + "\n")
 
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
