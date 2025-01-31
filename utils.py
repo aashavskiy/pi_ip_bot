@@ -1,34 +1,33 @@
 import os
 
+def load_whitelist(filename):
+    if not os.path.exists(filename):
+        return set()
+    with open(filename, "r") as f:
+        return set(line.strip() for line in f)
+
+def add_to_whitelist(filename, user_id, username=None):
+    with open(filename, "a") as f:
+        if username:
+            f.write(f"{user_id}  # {username}\n")
+        else:
+            f.write(f"{user_id}\n")
+
+def is_user_in_whitelist(filename, user_id):
+    whitelist = load_whitelist(filename)
+    return str(user_id) in whitelist
+
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 VPN_WHITELIST_FILE = "vpn_whitelist.txt"
 
-# Load bot and VPN whitelists
-def load_whitelist(filename):
-    """Load a whitelist from a file."""
-    if not os.path.exists(filename):
-        return {}
+def is_user_in_bot_whitelist(user_id):
+    return is_user_in_whitelist(BOT_WHITELIST_FILE, user_id)
 
-    with open(filename, "r") as file:
-        return dict(line.strip().split(" ", 1) for line in file if line.strip())
+def is_user_in_vpn_whitelist(user_id):
+    return is_user_in_whitelist(VPN_WHITELIST_FILE, user_id)
 
-BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)
-VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)
+def add_user_to_bot_whitelist(user_id, username=None):
+    add_to_whitelist(BOT_WHITELIST_FILE, user_id, username)
 
-def check_whitelist(user_id):
-    """Check if a user is in the bot whitelist."""
-    return str(user_id) in BOT_WHITELIST
-
-# Add user to a whitelist
-def add_to_whitelist(user_id, username, filename):
-    """Add a user to a specific whitelist file."""
-    with open(filename, "a") as file:
-        file.write(f"{user_id} {username}\n")
-
-def add_to_bot_whitelist(user_id, username):
-    """Add a user to the bot whitelist."""
-    add_to_whitelist(user_id, username, BOT_WHITELIST_FILE)
-
-def add_to_vpn_whitelist(user_id, username):
-    """Add a user to the VPN whitelist."""
-    add_to_whitelist(user_id, username, VPN_WHITELIST_FILE)
+def add_user_to_vpn_whitelist(user_id, username=None):
+    add_to_whitelist(VPN_WHITELIST_FILE, user_id, username)
