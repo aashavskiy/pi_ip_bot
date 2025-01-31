@@ -39,7 +39,6 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
 
 async def start_command(update: Update, context: CallbackContext) -> None:
     logging.info("DEBUG: /start command triggered")
-    await update.message.reply_text("👋 Welcome! Here is your menu:")
     await menu_command(update, context)
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
@@ -75,8 +74,6 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await request_vpn(update, context)
     elif text == "🔙 Back to Main Menu":
         await menu_command(update, context)
-    
-    await menu_command(update, context)  # Ensure menu is shown again after any action
 
 def register_handlers(application):
     application.add_handler(CommandHandler("start", start_command))
