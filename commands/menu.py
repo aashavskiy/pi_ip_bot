@@ -38,9 +38,12 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
                 date=query.message.date,
                 chat=query.message.chat,
                 from_user=query.from_user,
-                text=command
+                text=command,
+                bot=context.bot  # Attach the bot instance
             )
         )
+        fake_update._bot = context.bot  # Manually associate bot instance
+
         if command == "/ip":
             from commands.ip import ip_command
             await ip_command(fake_update, context)
