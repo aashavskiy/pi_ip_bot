@@ -1,6 +1,6 @@
 import logging
 from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, MessageHandler, filters
 from utils import is_user_in_vpn_whitelist
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -66,3 +66,6 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await request_vpn(update, context)
     elif text == "🔙 Back to Main Menu":
         await menu_command(update, context)
+
+def register_handlers(application):
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
