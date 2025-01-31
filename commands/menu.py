@@ -1,5 +1,5 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Message
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
 # Configure logging
@@ -31,14 +31,24 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     command = command_map.get(query.data)
     if command:
         await context.bot.send_message(chat_id=query.message.chat_id, text=f"⌛ Executing {command}...")
+        fake_update = Update(
+            update.update_id,
+            message=Message(
+                message_id=query.message.message_id,
+                date=query.message.date,
+                chat=query.message.chat,
+                from_user=query.from_user,
+                text=command
+            )
+        )
         if command == "/ip":
             from commands.ip import ip_command
-            await ip_command(update, context)
+            await ip_command(fake_update, context)
         elif command == "/uptime":
             from commands.uptime import uptime_command
-            await uptime_command(update, context)
+            await uptime_command(fake_update, context)
         elif command == "/vpn":
             from commands.vpn.request import request_vpn
-            await request_vpn(update, context)
+            await request_vpn(fake_update, context)
         elif command == "/end":
             await query.message.reply_text("👋 Goodbye! Closing the menu.")
