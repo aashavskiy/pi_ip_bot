@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval
+from commands.menu import menu_command  # Ensure menu is available
 
 # Load environment variables
 load_dotenv()
@@ -34,6 +35,7 @@ def main():
     
     app.add_handler(CallbackQueryHandler(handle_approval))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown_command))
+    app.add_handler(CommandHandler("menu", menu_command))  # Ensure menu command is available
     
     print("🤖 Bot is running...")
     app.run_polling()
