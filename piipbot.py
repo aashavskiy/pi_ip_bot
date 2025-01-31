@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from commands.menu import menu_command, handle_menu_buttons
 from commands.admin import handle_approval
+from commands.vpn.request import request_vpn
+from commands.vpn.approval import handle_vpn_approval
+from commands.vpn.devices import add_device, get_config
 
 # Load environment variables
 load_dotenv()
@@ -55,6 +58,13 @@ def main():
     # Add start and end commands
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("end", end_command))
+
+    # VPN implementation
+    app.add_handler(CommandHandler("vpn", request_vpn))
+    app.add_handler(CommandHandler("adddevice", add_device))
+    app.add_handler(CommandHandler("getconfig", get_config))
+    app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))
+
 
     # Add inline button handler for approving new users
     app.add_handler(CallbackQueryHandler(handle_approval))
