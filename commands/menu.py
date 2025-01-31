@@ -17,6 +17,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
+    logging.info(f"VPN menu requested by {user_id}")
     if is_user_in_vpn_whitelist(user_id):
         keyboard = [
             [KeyboardButton("📄 List My Devices")],
