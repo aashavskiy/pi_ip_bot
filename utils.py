@@ -4,7 +4,7 @@ def load_whitelist(filename):
     if not os.path.exists(filename):
         return set()
     with open(filename, "r") as f:
-        return set(line.strip() for line in f)
+        return set(line.strip().split()[0] for line in f)
 
 def add_to_whitelist(filename, user_id, username=None):
     with open(filename, "a") as f:
@@ -16,6 +16,9 @@ def add_to_whitelist(filename, user_id, username=None):
 def is_user_in_whitelist(filename, user_id):
     whitelist = load_whitelist(filename)
     return str(user_id) in whitelist
+
+def check_whitelist(user_id):
+    return is_user_in_whitelist(BOT_WHITELIST_FILE, user_id)
 
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 VPN_WHITELIST_FILE = "vpn_whitelist.txt"
