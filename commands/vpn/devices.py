@@ -26,6 +26,21 @@ def get_next_available_ip():
             return new_ip
     return None
 
+async def list_devices(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username
+    whitelist = load_whitelist(VPN_WHITELIST_FILE)
+    if user_id not in whitelist:
+        await update.message.reply_text("❌ You are not authorized to view VPN devices.")
+        return
+    
+    device_files = [f for f in os.listdir(VPN_CONFIG_DIR) if f.startswith(username)]
+    if not device_files:
+        await update.message.reply_text("📄 You have no registered VPN devices.")
+    else:
+        device_list = "\n".join([f"- {d}" for d in device_files])
+        await update.message.reply_text(f"📄 Your VPN devices:\n{device_list}")
+
 async def add_device(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username
