@@ -50,11 +50,9 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "/ip":
         from commands.ip import ip_command
         await ip_command(update, context)
-        await menu_command(update, context)
     elif text == "/uptime":
         from commands.uptime import uptime_command
         await uptime_command(update, context)
-        await menu_command(update, context)
     elif text == "/vpn":
         await vpn_menu(update, context)
     elif text == "/end":
@@ -62,25 +60,22 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "📄 List My Devices":
         from commands.vpn.devices import list_devices
         await list_devices(update, context)
-        await vpn_menu(update, context)
     elif text == "➕ Add Device":
         from commands.vpn.devices import add_device
         await add_device(update, context)
-        await vpn_menu(update, context)
     elif text == "❌ Remove Device":
         from commands.vpn.devices import remove_device
         await remove_device(update, context)
-        await vpn_menu(update, context)
     elif text == "📥 Get Config":
         from commands.vpn.devices import get_config
         await get_config(update, context)
-        await vpn_menu(update, context)
     elif text == "➕ Request VPN Access":
         from commands.vpn.request import request_vpn
         await request_vpn(update, context)
-        await vpn_menu(update, context)
     elif text == "🔙 Back to Main Menu":
         await menu_command(update, context)
+    
+    await menu_command(update, context)  # Ensure menu is shown again after any action
 
 def register_handlers(application):
     application.add_handler(CommandHandler("start", start_command))
