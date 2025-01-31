@@ -1,7 +1,7 @@
 import logging
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import VPN_WHITELIST_FILE, load_whitelist, save_whitelist
+from utils import VPN_WHITELIST_FILE, load_whitelist
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
