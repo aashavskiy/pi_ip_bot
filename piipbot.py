@@ -13,8 +13,9 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 async def clear_persistent_menu(application):
-    """Clear the menu near the input field."""
+    """Clear the persistent menu in Telegram."""
     await application.bot.set_my_commands([])
+    print("✅ Persistent menu removed")
 
 def load_commands():
     commands = {}
@@ -30,7 +31,7 @@ def load_commands():
     return commands
 
 async def start_command(update, context):
-    """Send a welcome message and show the menu."""
+    """Send a welcome message and show the inline menu."""
     await update.message.reply_text("👋 **Welcome!** Use the menu below:")
     await menu_command(update, context)
 
@@ -42,8 +43,13 @@ async def unknown_command(update, context):
     """Handle unknown commands."""
     await update.message.reply_text("❌ I don't recognize this command. Use /menu to see available options.")
 
+async def post_init(application):
+    """Run after bot initialization."""
+    await clear_persistent_menu(application)
+    print("✅ Post-init tasks completed")
+
 def main():
-    app = Application.builder().token(BOT_TOKEN).post_init(clear_persistent_menu).build()
+    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     
     # Dynamically load all command handlers
     commands = load_commands()
