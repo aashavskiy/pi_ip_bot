@@ -1,61 +1,39 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Message, Chat
-from telegram.ext import CallbackContext, CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
+from telegram.ext import CallbackContext
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
     keyboard = [
-        [InlineKeyboardButton("📡 IP Address", callback_data="menu_ip")],
-        [InlineKeyboardButton("📊 Uptime", callback_data="menu_uptime")],
-        [InlineKeyboardButton("🔐 VPN Access", callback_data="menu_vpn")],
-        [InlineKeyboardButton("👋 End", callback_data="menu_end")]
+        [KeyboardButton("📡 IP Address")],
+        [KeyboardButton("📊 Uptime")],
+        [KeyboardButton("🔐 VPN Access")],
+        [KeyboardButton("👋 End")]
     ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    if update.message:
-        await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
-    elif update.callback_query:
-        await update.callback_query.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+    await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    query = update.callback_query
-    await query.answer()
+    text = update.message.text.strip()
 
     command_map = {
-        "menu_ip": "/ip",
-        "menu_uptime": "/uptime",
-        "menu_vpn": "/vpn",
-        "menu_end": "/end"
+        "📡 IP Address": "/ip",
+        "📊 Uptime": "/uptime",
+        "🔐 VPN Access": "/vpn",
+        "👋 End": "/end"
     }
 
-    command = command_map.get(query.data)
+    command = command_map.get(text)
     if command:
-        fake_update = Update(
-            update.update_id,
-            message=Message(
-                message_id=query.message.message_id,
-                date=query.message.date,
-                chat=Chat(id=query.message.chat_id, type="private"),
-                from_user=query.from_user,
-                text=command,
-                bot=context.bot
-            )
-        )
-        fake_update._bot = context.bot
-        fake_update.effective_chat = fake_update.message.chat
-        fake_update.effective_user = fake_update.message.from_user
-
         if command == "/ip":
             from commands.ip import ip_command
-            await ip_command(fake_update, context)
+            await ip_command(update, context)
         elif command == "/uptime":
             from commands.uptime import uptime_command
-            await uptime_command(fake_update, context)
+            await uptime_command(update, context)
         elif command == "/vpn":
             from commands.vpn.request import request_vpn
-            await request_vpn(fake_update, context)
+            await request_vpn(update, context)
         elif command == "/end":
-            await query.message.reply_text("👋 Goodbye! Closing the menu.")
-            return
-        
-        await menu_command(update, context)  # Show menu after command execution
+            await update.message.reply_text("👋 Goodbye! Menu closed.")
