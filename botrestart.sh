@@ -4,4 +4,4 @@
 git pull 
 
 # Start the bot
-python bot.py
+python pii_bot.py
