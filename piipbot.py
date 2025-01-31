@@ -24,6 +24,15 @@ def load_commands():
 
     return commands
 
+async def start_command(update, context):
+    """Send a welcome message and show the menu."""
+    await update.message.reply_text("👋 **Welcome!** Use the menu below:")
+    await menu_command(update, context)
+
+async def end_command(update, context):
+    """End the conversation."""
+    await update.message.reply_text("👋 **Goodbye!** Closing the menu.", parse_mode="Markdown")
+
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
@@ -33,9 +42,13 @@ def main():
         app.add_handler(CommandHandler(cmd_name, cmd_func))
         print(f"✅ Loaded command: /{cmd_name}")
 
-    # Add inline menu command
+    # Add menu and inline button handlers
     app.add_handler(CommandHandler("menu", menu_command))
     app.add_handler(CallbackQueryHandler(handle_menu_buttons))
+
+    # Add start and end commands
+    app.add_handler(CommandHandler("start", start_command))
+    app.add_handler(CommandHandler("end", end_command))
 
     # Add inline button handler for approving new users
     app.add_handler(CallbackQueryHandler(handle_approval))
