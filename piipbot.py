@@ -36,7 +36,7 @@ def main():
         logging.info(f"✅ Loaded command: /{cmd_name}")
 
     # Add menu command handlers
-    app.add_handler(CommandHandler("start", menu_command))
+    app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("vpn", vpn_menu))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
 
@@ -45,6 +45,9 @@ def main():
 
     logging.info("🤖 Bot is running...")
     app.run_polling()
+
+async def start_command(update, context):
+    await menu_command(update, context)
 
 if __name__ == "__main__":
     main()
