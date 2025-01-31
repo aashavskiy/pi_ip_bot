@@ -2,11 +2,9 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Message, Chat
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
-    """Display the inline menu with buttons."""
     keyboard = [
         [InlineKeyboardButton("📡 IP Address", callback_data="menu_ip")],
         [InlineKeyboardButton("📊 Uptime", callback_data="menu_uptime")],
@@ -17,7 +15,6 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    """Handle button clicks from the inline menu."""
     query = update.callback_query
     await query.answer()
 
@@ -35,15 +32,15 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
             message=Message(
                 message_id=query.message.message_id,
                 date=query.message.date,
-                chat=Chat(id=query.message.chat_id, type="private"),  # Ensure chat is valid
+                chat=Chat(id=query.message.chat_id, type="private"),
                 from_user=query.from_user,
                 text=command,
-                bot=context.bot  # Attach the bot instance
+                bot=context.bot
             )
         )
-        fake_update._bot = context.bot  # Manually associate bot instance
-        fake_update.effective_chat = fake_update.message.chat  # Ensure effective_chat is set
-        fake_update.effective_user = fake_update.message.from_user  # Ensure effective_user is set
+        fake_update._bot = context.bot
+        fake_update.effective_chat = fake_update.message.chat
+        fake_update.effective_user = fake_update.message.from_user
 
         if command == "/ip":
             from commands.ip import ip_command
@@ -56,3 +53,6 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
             await request_vpn(fake_update, context)
         elif command == "/end":
             await query.message.reply_text("👋 Goodbye! Closing the menu.")
+            return
+        
+        await menu_command(update, context)  # Show menu after command execution
