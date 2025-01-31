@@ -12,7 +12,10 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
         [InlineKeyboardButton("👋 End", callback_data="menu_end")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
+    if update.message:
+        await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
+    elif update.callback_query:
+        await update.callback_query.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
