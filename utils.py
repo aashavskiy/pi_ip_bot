@@ -20,6 +20,8 @@ def is_user_in_whitelist(filename, user_id):
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 VPN_WHITELIST_FILE = "vpn_whitelist.txt"
 
+VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)
+
 def is_user_in_bot_whitelist(user_id):
     return is_user_in_whitelist(BOT_WHITELIST_FILE, user_id)
 
@@ -29,5 +31,5 @@ def is_user_in_vpn_whitelist(user_id):
 def add_user_to_bot_whitelist(user_id, username=None):
     add_to_whitelist(BOT_WHITELIST_FILE, user_id, username)
 
-def add_user_to_vpn_whitelist(user_id, username=None):
+def add_to_vpn_whitelist(user_id, username=None):
     add_to_whitelist(VPN_WHITELIST_FILE, user_id, username)
