@@ -1,6 +1,6 @@
 import logging
 from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
-from telegram.ext import CallbackContext, MessageHandler, Filters
+from telegram.ext import CallbackContext, MessageHandler, filters
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
