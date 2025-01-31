@@ -1,5 +1,6 @@
 import os
 import importlib
+import asyncio
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from telegram import BotCommand
@@ -47,11 +48,11 @@ async def unknown_command(update, context):
     """Handle unknown commands."""
     await update.message.reply_text("❌ I don't recognize this command. Use /menu to see available options.")
 
-def main():
+async def main():
     app = Application.builder().token(BOT_TOKEN).build()
     
-    # Run clear_persistent_menu within bot's event loop
-    app.run_async(clear_persistent_menu(app))
+    # Clear persistent menu before running the bot
+    await clear_persistent_menu(app)
 
     # Dynamically load all command handlers
     commands = load_commands()
@@ -82,7 +83,7 @@ def main():
     app.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 
     print("🤖 Bot is running...")
-    app.run_polling()
+    await app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
