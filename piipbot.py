@@ -6,7 +6,7 @@ from commands.menu import menu_command, handle_menu_buttons
 from commands.admin import handle_approval
 from commands.vpn.request import request_vpn
 from commands.vpn.approval import handle_vpn_approval
-from commands.vpn.devices import add_device, get_config
+from commands.vpn.devices import add_device, get_config, list_devices, remove_device
 
 # Load environment variables
 load_dotenv()
@@ -16,11 +16,11 @@ def load_commands():
     commands = {}
     commands_dir = "commands"
 
-    for root, _, files in os.walk(commands_dir):  # Walk through subdirectories
+    for root, _, files in os.walk(commands_dir):
         for filename in files:
-            if filename.endswith(".py") and filename not in ["__init__.py", "menu.py"]:
+            if filename.endswith(".py") and filename not in ["__init__.py", "menu.py", "time.py", "weather.py"]:
                 module_path = os.path.join(root, filename)
-                module_name = module_path.replace("/", ".").replace("\\", ".")[:-3]  # Convert to Python import path
+                module_name = module_path.replace("/", ".").replace("\\", ".")[:-3]
                 
                 module = importlib.import_module(module_name)
 
@@ -59,12 +59,13 @@ def main():
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("end", end_command))
 
-    # VPN implementation
+    # Add VPN commands
     app.add_handler(CommandHandler("vpn", request_vpn))
     app.add_handler(CommandHandler("adddevice", add_device))
     app.add_handler(CommandHandler("getconfig", get_config))
+    app.add_handler(CommandHandler("listdevices", list_devices))
+    app.add_handler(CommandHandler("removedevice", remove_device))
     app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))
-
 
     # Add inline button handler for approving new users
     app.add_handler(CallbackQueryHandler(handle_approval))

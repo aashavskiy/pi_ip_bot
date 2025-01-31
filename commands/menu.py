@@ -7,9 +7,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
     keyboard = [
         [InlineKeyboardButton("🚀 Start", callback_data="cmd_start")],
         [InlineKeyboardButton("📡 Get IP", callback_data="cmd_ip")],
-        [InlineKeyboardButton("🕒 Time", callback_data="cmd_time"),
-         InlineKeyboardButton("📊 Uptime", callback_data="cmd_uptime")],
-        [InlineKeyboardButton("🌦 Weather", callback_data="cmd_weather")],
+        [InlineKeyboardButton("📊 Uptime", callback_data="cmd_uptime")],
         [InlineKeyboardButton("🔑 VPN Menu", callback_data="cmd_vpn")],
         [InlineKeyboardButton("❌ End", callback_data="cmd_end")],
     ]
@@ -25,9 +23,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     command_mapping = {
         "cmd_start": "/start",
         "cmd_ip": "/ip",
-        "cmd_time": "/time",
         "cmd_uptime": "/uptime",
-        "cmd_weather": "/weather",
         "cmd_vpn": "/vpn",
         "cmd_end": "/end",
     }
