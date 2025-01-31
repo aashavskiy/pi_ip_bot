@@ -42,9 +42,11 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     if text == "/ip":
         from commands.ip import ip_command
         await ip_command(update, context)
+        await menu_command(update, context)
     elif text == "/uptime":
         from commands.uptime import uptime_command
         await uptime_command(update, context)
+        await menu_command(update, context)
     elif text == "/vpn":
         await vpn_menu(update, context)
     elif text == "/end":
@@ -68,6 +70,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "➕ Request VPN Access":
         from commands.vpn.request import request_vpn
         await request_vpn(update, context)
+        await vpn_menu(update, context)
     elif text == "🔙 Back to Main Menu":
         await menu_command(update, context)
 
