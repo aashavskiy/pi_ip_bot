@@ -9,18 +9,20 @@ from commands.admin import handle_approval
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# Function to dynamically load command handlers from the "commands" folder
 def load_commands():
     commands = {}
     commands_dir = "commands"
 
-    for filename in os.listdir(commands_dir):
-        if filename.endswith(".py") and filename not in ["__init__.py", "menu.py"]:
-            module_name = f"{commands_dir}.{filename[:-3]}"  # Remove .py extension
-            module = importlib.import_module(module_name)
+    for root, _, files in os.walk(commands_dir):  # Walk through subdirectories
+        for filename in files:
+            if filename.endswith(".py") and filename not in ["__init__.py", "menu.py"]:
+                module_path = os.path.join(root, filename)
+                module_name = module_path.replace("/", ".").replace("\\", ".")[:-3]  # Convert to Python import path
+                
+                module = importlib.import_module(module_name)
 
-            if hasattr(module, f"{filename[:-3]}_command"):
-                commands[filename[:-3]] = getattr(module, f"{filename[:-3]}_command")
+                if hasattr(module, f"{filename[:-3]}_command"):
+                    commands[filename[:-3]] = getattr(module, f"{filename[:-3]}_command")
 
     return commands
 
