@@ -2,9 +2,8 @@ import os
 import importlib
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from commands.menu import menu_command, handle_menu_buttons
 from commands.admin import handle_approval
-from commands.vpn import request_vpn, add_device, list_devices, remove_device, get_config
-from commands.vpn.approval import handle_vpn_approval  # ✅ Import directly from approval.py
 
 # Load environment variables
 load_dotenv()
@@ -16,7 +15,7 @@ def load_commands():
     commands_dir = "commands"
 
     for filename in os.listdir(commands_dir):
-        if filename.endswith(".py") and filename != "__init__.py":
+        if filename.endswith(".py") and filename not in ["__init__.py", "menu.py"]:
             module_name = f"{commands_dir}.{filename[:-3]}"  # Remove .py extension
             module = importlib.import_module(module_name)
 
@@ -25,7 +24,6 @@ def load_commands():
 
     return commands
 
-# Main function to start the bot
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
@@ -35,15 +33,12 @@ def main():
         app.add_handler(CommandHandler(cmd_name, cmd_func))
         print(f"✅ Loaded command: /{cmd_name}")
 
-    # Add VPN-specific handlers
-    app.add_handler(CommandHandler("vpn", request_vpn))
-    app.add_handler(CommandHandler("adddevice", add_device))
-    app.add_handler(CommandHandler("listdevices", list_devices))
-    app.add_handler(CommandHandler("removedevice", remove_device))
-    app.add_handler(CommandHandler("getconfig", get_config))
+    # Add inline menu command
+    app.add_handler(CommandHandler("menu", menu_command))
+    app.add_handler(CallbackQueryHandler(handle_menu_buttons))
 
-    # Add inline button handler for VPN approval
-    app.add_handler(CallbackQueryHandler(handle_vpn_approval, pattern="vpn_approve_|vpn_deny_"))
+    # Add inline button handler for approving new users
+    app.add_handler(CallbackQueryHandler(handle_approval))
 
     print("🤖 Bot is running...")
     app.run_polling()
