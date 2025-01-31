@@ -39,7 +39,9 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     text = update.message.text.strip()
     
-    if text == "/ip":
+    if text == "/start":
+        await menu_command(update, context)
+    elif text == "/ip":
         from commands.ip import ip_command
         await ip_command(update, context)
         await menu_command(update, context)
