@@ -41,6 +41,28 @@ async def list_devices(update: Update, context: CallbackContext) -> None:
         device_list = "\n".join([f"- {d}" for d in device_files])
         await update.message.reply_text(f"📄 Your VPN devices:\n{device_list}")
 
+async def remove_device(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username
+    whitelist = load_whitelist(VPN_WHITELIST_FILE)
+    if user_id not in whitelist:
+        await update.message.reply_text("❌ You are not authorized to remove VPN devices.")
+        return
+
+    if not context.args or len(context.args) == 0:
+        await update.message.reply_text("❌ Please specify a device name to remove.")
+        return
+
+    device_name = context.args[0]
+    device_config_path = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
+
+    if not os.path.exists(device_config_path):
+        await update.message.reply_text("⚠ Device not found.")
+        return
+    
+    os.remove(device_config_path)
+    await update.message.reply_text(f"✅ VPN device `{device_name}` removed successfully.")
+
 async def add_device(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username
