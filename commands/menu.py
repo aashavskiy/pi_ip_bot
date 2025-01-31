@@ -1,81 +1,53 @@
-import logging
-from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
-from telegram.ext import CallbackContext, MessageHandler, filters, CommandHandler
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import CallbackContext
 from utils import is_user_in_vpn_whitelist
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+def get_main_menu():
+    return ReplyKeyboardMarkup([
+        ["📡 IP Address", "🕒 Uptime"],
+        ["🔐 VPN"]
+    ], resize_keyboard=True)
+
+def get_vpn_menu():
+    return ReplyKeyboardMarkup([
+        ["➕ Add Device", "📄 List My Devices"],
+        ["📥 Get Config", "❌ Remove Device"],
+        ["🔙 Back"]
+    ], resize_keyboard=True)
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
-    logging.info("DEBUG: menu_command triggered")
-    keyboard = [
-        [KeyboardButton("/ip")],
-        [KeyboardButton("/uptime")],
-        [KeyboardButton("/vpn")],
-        [KeyboardButton("/end")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
-    await update.message.reply_text("📌 **Choose an option:**", reply_markup=reply_markup, parse_mode="Markdown")
+    await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
-    logging.info(f"DEBUG: VPN menu requested by {user_id}")
     if is_user_in_vpn_whitelist(user_id):
-        keyboard = [
-            [KeyboardButton("📄 List My Devices")],
-            [KeyboardButton("➕ Add Device")],
-            [KeyboardButton("❌ Remove Device")],
-            [KeyboardButton("📥 Get Config")],
-            [KeyboardButton("🔙 Back to Main Menu")]
-        ]
-        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
-        await update.message.reply_text("🔐 **VPN Menu:**", reply_markup=reply_markup, parse_mode="Markdown")
+        await update.message.reply_text("🔐 VPN Menu:", reply_markup=get_vpn_menu())
     else:
-        keyboard = [
-            [KeyboardButton("➕ Request VPN Access")],
-            [KeyboardButton("🔙 Back to Main Menu")]
-        ]
-        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
-        await update.message.reply_text("❌ You are not yet approved for VPN access.", reply_markup=reply_markup, parse_mode="Markdown")
-
-async def start_command(update: Update, context: CallbackContext) -> None:
-    logging.info("DEBUG: /start command triggered")
-    await menu_command(update, context)
+        await update.message.reply_text("❌ You are not authorized for VPN access.")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    text = update.message.text.strip()
-    logging.info(f"DEBUG: Button pressed -> {text}")
-    
-    if text == "/start":
-        await start_command(update, context)
-    elif text == "/ip":
+    text = update.message.text
+    if text == "📡 IP Address":
         from commands.ip import ip_command
         await ip_command(update, context)
-    elif text == "/uptime":
+    elif text == "🕒 Uptime":
         from commands.uptime import uptime_command
         await uptime_command(update, context)
-    elif text == "/vpn":
-        logging.info(f"VPN menu triggered for user {update.message.from_user.id}")
+    elif text == "🔐 VPN":
         await vpn_menu(update, context)
-    elif text == "/end":
-        await update.message.reply_text("👋 Goodbye! Menu closed.", reply_markup=ReplyKeyboardMarkup([], resize_keyboard=True))
-    elif text == "📄 List My Devices":
-        from commands.vpn.devices import list_devices
-        await list_devices(update, context)
     elif text == "➕ Add Device":
         from commands.vpn.devices import add_device
         await add_device(update, context)
-    elif text == "❌ Remove Device":
-        from commands.vpn.devices import remove_device
-        await remove_device(update, context)
+    elif text == "📄 List My Devices":
+        from commands.vpn.devices import list_devices
+        await list_devices(update, context)
     elif text == "📥 Get Config":
         from commands.vpn.devices import get_config
         await get_config(update, context)
-    elif text == "➕ Request VPN Access":
-        from commands.vpn.request import request_vpn
-        await request_vpn(update, context)
-    elif text == "🔙 Back to Main Menu":
+    elif text == "❌ Remove Device":
+        from commands.vpn.devices import remove_device
+        await remove_device(update, context)
+    elif text == "🔙 Back":
         await menu_command(update, context)
-
-def register_handlers(application):
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
+    else:
+        await update.message.reply_text("❌ Unknown command.")
