@@ -4,7 +4,7 @@ def load_whitelist(filename):
     if not os.path.exists(filename):
         return set()
     with open(filename, "r") as f:
-        return set(line.strip().split()[0] for line in f)
+        return set(line.strip().split()[0] for line in f if line.strip())
 
 def add_to_whitelist(filename, user_id, username=None):
     with open(filename, "a") as f:
