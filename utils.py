@@ -15,6 +15,10 @@ def load_whitelist(filename):
 BOT_WHITELIST = load_whitelist(BOT_WHITELIST_FILE)
 VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)
 
+def check_whitelist(user_id):
+    """Check if a user is in the bot whitelist."""
+    return str(user_id) in BOT_WHITELIST
+
 # Add user to a whitelist
 def add_to_whitelist(user_id, username, filename):
     """Add a user to a specific whitelist file."""
