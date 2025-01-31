@@ -1,7 +1,7 @@
 import os
 import importlib
 from dotenv import load_dotenv
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from commands.menu import menu_command, handle_menu_buttons
 from commands.admin import handle_approval
 
@@ -33,6 +33,10 @@ async def end_command(update, context):
     """End the conversation."""
     await update.message.reply_text("👋 **Goodbye!** Closing the menu.", parse_mode="Markdown")
 
+async def unknown_command(update, context):
+    """Handle unknown commands."""
+    await update.message.reply_text("❌ I don't recognize this command. Use /menu to see available options.")
+
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
@@ -52,6 +56,9 @@ def main():
 
     # Add inline button handler for approving new users
     app.add_handler(CallbackQueryHandler(handle_approval))
+
+    # Handle unknown commands
+    app.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 
     print("🤖 Bot is running...")
     app.run_polling()
