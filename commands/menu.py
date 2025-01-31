@@ -54,6 +54,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         from commands.uptime import uptime_command
         await uptime_command(update, context)
     elif text == "/vpn":
+        logging.info(f"VPN menu triggered for user {update.message.from_user.id}")
         await vpn_menu(update, context)
     elif text == "/end":
         await update.message.reply_text("👋 Goodbye! Menu closed.", reply_markup=ReplyKeyboardMarkup([], resize_keyboard=True))
