@@ -52,15 +52,19 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "📄 List My Devices":
         from commands.vpn.devices import list_devices
         await list_devices(update, context)
+        await vpn_menu(update, context)
     elif text == "➕ Add Device":
         from commands.vpn.devices import add_device
         await add_device(update, context)
+        await vpn_menu(update, context)
     elif text == "❌ Remove Device":
         from commands.vpn.devices import remove_device
         await remove_device(update, context)
+        await vpn_menu(update, context)
     elif text == "📥 Get Config":
         from commands.vpn.devices import get_config
         await get_config(update, context)
+        await vpn_menu(update, context)
     elif text == "➕ Request VPN Access":
         from commands.vpn.request import request_vpn
         await request_vpn(update, context)
