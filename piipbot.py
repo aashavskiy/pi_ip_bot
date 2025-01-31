@@ -51,8 +51,8 @@ async def unknown_command(update, context):
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     
-    # Clear persistent menu before running the bot
-    asyncio.run(clear_persistent_menu(app))
+    # Schedule clearing the persistent menu inside the event loop
+    asyncio.create_task(clear_persistent_menu(app))
 
     # Dynamically load all command handlers
     commands = load_commands()
