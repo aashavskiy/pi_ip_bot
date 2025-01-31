@@ -48,7 +48,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "/vpn":
         await vpn_menu(update, context)
     elif text == "/end":
-        await update.message.reply_text("👋 Goodbye! Menu closed.")
+        await update.message.reply_text("👋 Goodbye! Menu closed.", reply_markup=ReplyKeyboardMarkup([], resize_keyboard=True))
     elif text == "📄 List My Devices":
         from commands.vpn.devices import list_devices
         await list_devices(update, context)
