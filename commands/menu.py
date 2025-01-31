@@ -6,6 +6,7 @@ from utils import is_user_in_vpn_whitelist
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
+    logging.info("DEBUG: menu_command triggered")
     keyboard = [
         [KeyboardButton("/ip")],
         [KeyboardButton("/uptime")],
@@ -17,7 +18,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
-    logging.info(f"VPN menu requested by {user_id}")
+    logging.info(f"DEBUG: VPN menu requested by {user_id}")
     if is_user_in_vpn_whitelist(user_id):
         keyboard = [
             [KeyboardButton("📄 List My Devices")],
@@ -37,6 +38,7 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("❌ You are not yet approved for VPN access.", reply_markup=reply_markup, parse_mode="Markdown")
 
 async def start_command(update: Update, context: CallbackContext) -> None:
+    logging.info("DEBUG: /start command triggered")
     await update.message.reply_text("👋 Welcome! Here is your menu:")
     await menu_command(update, context)
 
