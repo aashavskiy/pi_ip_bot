@@ -1,6 +1,9 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext
 from utils import is_user_in_vpn_whitelist
+from commands.vpn.devices import add_device, list_devices, get_config, remove_device
+from commands.ip import ip_command
+from commands.uptime import uptime_command
 
 def get_main_menu():
     return ReplyKeyboardMarkup([
@@ -28,24 +31,18 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     text = update.message.text
     if text == "📡 IP Address":
-        from commands.ip import ip_command
         await ip_command(update, context)
     elif text == "🕒 Uptime":
-        from commands.uptime import uptime_command
         await uptime_command(update, context)
     elif text == "🔐 VPN":
         await vpn_menu(update, context)
     elif text == "➕ Add Device":
-        from commands.vpn.devices import add_device
         await add_device(update, context)
     elif text == "📄 List My Devices":
-        from commands.vpn.devices import list_devices
         await list_devices(update, context)
     elif text == "📥 Get Config":
-        from commands.vpn.devices import get_config
         await get_config(update, context)
     elif text == "❌ Remove Device":
-        from commands.vpn.devices import remove_device
         await remove_device(update, context)
     elif text == "🔙 Back":
         await menu_command(update, context)
