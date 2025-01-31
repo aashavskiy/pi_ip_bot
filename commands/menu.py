@@ -1,6 +1,6 @@
 import logging
 from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
-from telegram.ext import CallbackContext, MessageHandler, filters
+from telegram.ext import CallbackContext, MessageHandler, filters, CommandHandler
 from utils import is_user_in_vpn_whitelist
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -36,11 +36,15 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
         reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
         await update.message.reply_text("❌ You are not yet approved for VPN access.", reply_markup=reply_markup, parse_mode="Markdown")
 
+async def start_command(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text("👋 Welcome! Here is your menu:")
+    await menu_command(update, context)
+
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     text = update.message.text.strip()
     
     if text == "/start":
-        await menu_command(update, context)
+        await start_command(update, context)
     elif text == "/ip":
         from commands.ip import ip_command
         await ip_command(update, context)
@@ -77,4 +81,5 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await menu_command(update, context)
 
 def register_handlers(application):
+    application.add_handler(CommandHandler("start", start_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
