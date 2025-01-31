@@ -2,6 +2,7 @@ import os
 import importlib
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
+from telegram import BotCommand
 from commands.menu import menu_command, handle_menu_buttons
 from commands.admin import handle_approval
 from commands.vpn.request import request_vpn
@@ -11,6 +12,10 @@ from commands.vpn.devices import add_device, get_config, list_devices, remove_de
 # Load environment variables
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+async def clear_persistent_menu(application):
+    """Clear the menu near the input field."""
+    await application.bot.set_my_commands([])  # Remove all persistent commands
 
 def load_commands():
     commands = {}
@@ -26,7 +31,7 @@ def load_commands():
 
                 if hasattr(module, f"{filename[:-3]}_command"):
                     commands[filename[:-3]] = getattr(module, f"{filename[:-3]}_command")
-
+    
     return commands
 
 async def start_command(update, context):
@@ -44,6 +49,9 @@ async def unknown_command(update, context):
 
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
+
+    # Clear persistent menu before running the bot
+    app.job_queue.run_once(lambda _: clear_persistent_menu(app), when=0)
 
     # Dynamically load all command handlers
     commands = load_commands()
