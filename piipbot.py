@@ -1,6 +1,5 @@
 import os
 import importlib
-import asyncio
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from telegram import BotCommand
@@ -51,8 +50,8 @@ async def unknown_command(update, context):
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     
-    # Schedule clearing the persistent menu inside the event loop
-    asyncio.create_task(clear_persistent_menu(app))
+    # Run clear_persistent_menu within bot's event loop
+    app.run_async(clear_persistent_menu(app))
 
     # Dynamically load all command handlers
     commands = load_commands()
