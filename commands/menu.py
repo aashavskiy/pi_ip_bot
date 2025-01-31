@@ -1,7 +1,7 @@
 import logging
 from telegram import ReplyKeyboardMarkup, KeyboardButton, Update
 from telegram.ext import CallbackContext
-from utils import check_vpn_whitelist
+from utils import is_user_in_vpn_whitelist
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -17,7 +17,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
-    if check_vpn_whitelist(user_id):
+    if is_user_in_vpn_whitelist(user_id):
         keyboard = [
             [KeyboardButton("📄 List My Devices")],
             [KeyboardButton("➕ Add Device")],
