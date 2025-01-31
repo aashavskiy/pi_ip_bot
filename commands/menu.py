@@ -3,7 +3,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Message
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
     """Display the inline menu with buttons."""
@@ -30,7 +30,6 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
 
     command = command_map.get(query.data)
     if command:
-        await context.bot.send_message(chat_id=query.message.chat_id, text=f"⌛ Executing {command}...")
         fake_update = Update(
             update.update_id,
             message=Message(
