@@ -1,5 +1,5 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Message
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Message, Chat
 from telegram.ext import CallbackContext, CallbackQueryHandler
 
 # Configure logging
@@ -36,7 +36,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
             message=Message(
                 message_id=query.message.message_id,
                 date=query.message.date,
-                chat=query.message.chat,
+                chat=Chat(id=query.message.chat_id, type="private"),  # Ensure chat is valid
                 from_user=query.from_user,
                 text=command,
                 bot=context.bot  # Attach the bot instance
