@@ -45,6 +45,7 @@ def main():
 
     # Add start command and button handler
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
     app.add_handler(CallbackQueryHandler(handle_menu_buttons, pattern='^(?!approve|deny).*$'))
     app.add_handler(CallbackQueryHandler(handle_approval_callback, pattern='^(approve|deny):'))
 
