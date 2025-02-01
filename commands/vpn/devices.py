@@ -18,6 +18,20 @@ def save_whitelist(filename, data):
 
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
+def get_next_ip():
+    # This function should return the next available IP address in the VPN subnet
+    # For simplicity, we'll use a counter stored in a file
+    ip_counter_file = "/etc/wireguard/ip_counter.txt"
+    if not os.path.exists(ip_counter_file):
+        with open(ip_counter_file, "w") as file:
+            file.write("2")  # Start from .2 to avoid conflicts with the server
+    with open(ip_counter_file, "r") as file:
+        counter = int(file.read().strip())
+    next_ip = f"10.0.0.{counter}"
+    with open(ip_counter_file, "w") as file:
+        file.write(str(counter + 1))
+    return next_ip
+
 async def list_devices(update: Update, context):
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
@@ -46,14 +60,17 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     private_key = subprocess.check_output(["wg", "genkey"]).strip().decode('utf-8')
     public_key = subprocess.check_output(["wg", "pubkey"], input=private_key.encode('utf-8')).strip().decode('utf-8')
 
+    # Get the next available IP address
+    device_ip = get_next_ip()
+
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     with open(device_config, "w") as f:
-        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = 10.0.0.X/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
+        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
-    subprocess.run(["sudo", script_path, "add", username, device_name, public_key])
+    subprocess.run(["sudo", script_path, "add", username, device_name, public_key, f"{device_ip}/32"])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 

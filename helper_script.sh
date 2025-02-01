@@ -4,6 +4,7 @@ ACTION=$1
 USERNAME=$2
 DEVICE_NAME=$3
 PUBLIC_KEY=$4
+DEVICE_IP=$5
 WG_CONFIG_FILE="/etc/wireguard/wg0.conf"
 
 validate_config() {
@@ -15,7 +16,7 @@ validate_config() {
 }
 
 if [ "$ACTION" == "add" ]; then
-    echo -e "\n# ${USERNAME}_${DEVICE_NAME}\n[Peer]\nPublicKey = ${PUBLIC_KEY}\nAllowedIPs = 10.0.0.X/32" >> $WG_CONFIG_FILE
+    echo -e "\n# ${USERNAME}_${DEVICE_NAME}\n[Peer]\nPublicKey = ${PUBLIC_KEY}\nAllowedIPs = ${DEVICE_IP}" >> $WG_CONFIG_FILE
     validate_config
 elif [ "$ACTION" == "remove" ]; then
     sed -i "/# ${USERNAME}_${DEVICE_NAME}/,/^$/d" $WG_CONFIG_FILE
