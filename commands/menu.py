@@ -46,8 +46,10 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     if update.message:
         text = update.message.text.strip()
+        message = update.message
     elif update.callback_query:
         text = update.callback_query.data
+        message = update.callback_query.message
     else:
         return
 
@@ -70,4 +72,4 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "/menu":
         await menu_command(update, context)
     else:
-        await update.message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
+        await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
