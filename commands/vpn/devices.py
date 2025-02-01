@@ -10,7 +10,7 @@ def save_whitelist(filename, data):
 
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
-def list_devices(username: str):
+async def list_devices(update: Update, context):
     user_devices = []
     if os.path.exists(VPN_WHITELIST_FILE):
         with open(VPN_WHITELIST_FILE, "r") as file:
