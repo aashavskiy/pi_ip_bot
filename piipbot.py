@@ -3,7 +3,7 @@ import importlib
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from commands.admin import handle_approval
+from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
@@ -44,6 +44,7 @@ def main():
     # Add start command and button handler
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(handle_menu_buttons))
+    app.add_handler(CallbackQueryHandler(handle_approval_callback, pattern='^(approve|deny):'))
 
     # Register VPN commands
     app.add_handler(CommandHandler("vpn", vpn_menu))

@@ -1,5 +1,5 @@
 import os
-from telegram import Bot
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 ADMIN_ID = os.getenv("ADMIN_ID")
 
@@ -50,4 +50,11 @@ async def request_approval(user_id, username):
     if not admin_id:
         raise ValueError("ADMIN_ID is not set in the environment variables.")
     message = f"🚨 Approval request:\nUser ID: {user_id}\nUsername: @{username}"
-    await bot.send_message(chat_id=admin_id, text=message)
+    keyboard = [
+        [
+            InlineKeyboardButton("Approve", callback_data=f"approve:{user_id}:{username}"),
+            InlineKeyboardButton("Deny", callback_data=f"deny:{user_id}:{username}")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await bot.send_message(chat_id=admin_id, text=message, reply_markup=reply_markup)
