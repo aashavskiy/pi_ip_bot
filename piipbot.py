@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu  # Исправленный импорт
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu  # Добавлен импорт get_main_menu
 
 # Load environment variables
 load_dotenv()
