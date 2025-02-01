@@ -21,6 +21,7 @@ def load_commands():
             module = importlib.import_module(module_name)
             if hasattr(module, f"{filename[:-3]}_command"):
                 commands[filename[:-3]] = getattr(module, f"{filename[:-3]}_command")
+    logging.info(f"✅ Loaded commands: {', '.join(commands.keys())}")
     return commands
 
 async def vpn_button_handler(update: Update, context):
@@ -39,4 +40,5 @@ app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработ
 
 if __name__ == "__main__":
     logging.info("🤖 Bot is running...")
+    commands = load_commands()  # Загружаем команды и логируем их
     app.run_polling()
