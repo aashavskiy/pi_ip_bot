@@ -75,14 +75,16 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     if update.message:
         user_id = str(update.message.from_user.id)
         username = update.message.from_user.username or f"User_{user_id}"
+        reply_func = update.message.reply_text
     elif update.callback_query:
         user_id = str(update.callback_query.from_user.id)
         username = update.callback_query.from_user.username or f"User_{user_id}"
+        reply_func = update.callback_query.message.reply_text
     else:
         return
 
     if context.args is None or len(context.args) == 0:
-        await update.message.reply_text("❌ Please specify a device name to remove.")
+        await reply_func("❌ Please specify a device name to remove.")
         return
     device_name = context.args[0]
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
@@ -101,9 +103,9 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
         # Use a helper script to remove device from wg0.conf and restart WireGuard
         script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
         subprocess.run(["sudo", script_path, "remove", username, device_name])
-        await update.message.reply_text(f"✅ Device {device_name} removed and WireGuard restarted.")
+        await reply_func(f"✅ Device {device_name} removed and WireGuard restarted.")
     else:
-        await update.message.reply_text("❌ Device not found.")
+        await reply_func("❌ Device not found.")
 
 async def get_config(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
