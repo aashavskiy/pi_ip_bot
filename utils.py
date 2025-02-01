@@ -46,16 +46,16 @@ def is_user_authorized(user_id):
     logging.info(f"Authorized users: {authorized_users}")
     return user_id in authorized_users
 
-async def request_approval(user_id, username):
+async def request_approval(user_id, username, approval_type):
     bot = Bot(token=os.getenv("BOT_TOKEN"))
     admin_id = os.getenv("ADMIN_ID")
     if not admin_id:
         raise ValueError("ADMIN_ID is not set in the environment variables.")
-    message = f"🚨 Approval request:\nUser ID: {user_id}\nUsername: @{username}"
+    message = f"🚨 Approval request for {approval_type} access:\nUser ID: {user_id}\nUsername: @{username}"
     keyboard = [
         [
-            InlineKeyboardButton("Approve", callback_data=f"approve:{user_id}:{username}"),
-            InlineKeyboardButton("Deny", callback_data=f"deny:{user_id}:{username}")
+            InlineKeyboardButton("Approve", callback_data=f"approve:{user_id}:{username}:{approval_type}"),
+            InlineKeyboardButton("Deny", callback_data=f"deny:{user_id}:{username}:{approval_type}")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

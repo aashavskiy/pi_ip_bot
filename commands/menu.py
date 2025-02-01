@@ -44,7 +44,7 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
     logging.info(f"Checking VPN authorization for user ID: {user_id}, Username: {username}")
 
     if not is_user_in_vpn_whitelist(user_id):
-        await request_approval(user_id, username)
+        await request_approval(user_id, username, "vpn")
         await update.message.reply_text("❌ You are not authorized for VPN access. An approval request has been sent to the admin.")
         return
 
