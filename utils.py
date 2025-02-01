@@ -46,5 +46,8 @@ def is_user_authorized(user_id):
 
 async def request_approval(user_id, username):
     bot = Bot(token=os.getenv("BOT_TOKEN"))
+    admin_id = os.getenv("ADMIN_ID")
+    if not admin_id:
+        raise ValueError("ADMIN_ID is not set in the environment variables.")
     message = f"🚨 Approval request:\nUser ID: {user_id}\nUsername: @{username}"
-    await bot.send_message(chat_id=ADMIN_ID, text=message)
+    await bot.send_message(chat_id=admin_id, text=message)

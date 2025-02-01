@@ -11,6 +11,10 @@ from commands.vpn.devices import add_device, list_devices, get_config, remove_de
 # Load environment variables
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = os.getenv("ADMIN_ID")
+
+if not ADMIN_ID:
+    raise ValueError("ADMIN_ID is not set in the environment variables.")
 
 # Function to dynamically load command handlers from the "commands" folder
 def load_commands():
