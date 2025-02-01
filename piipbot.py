@@ -21,7 +21,7 @@ def load_commands():
             module = importlib.import_module(module_name)
             if hasattr(module, f"{filename[:-3]}_command"):
                 commands[filename[:-3]] = getattr(module, f"{filename[:-3]}_command")
-    logging.info(f"✅ Loaded commands: {', '.join(commands.keys())}")
+    logging.info(f"✅ Loaded commands from {commands_dir}: {', '.join(commands.keys())}")
     return commands
 
 async def vpn_button_handler(update: Update, context):
@@ -39,6 +39,10 @@ app.add_handler(CallbackQueryHandler(handle_menu_buttons))
 app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработчик
 
 if __name__ == "__main__":
-    logging.info("🤖 Bot is running...")
+    logging.info("🤖 piipbot.py is running...")
     commands = load_commands()  # Загружаем команды и логируем их
+    if commands:
+        logging.info(f"📌 Available commands: {', '.join(commands.keys())}")
+    else:
+        logging.warning("⚠️ No commands loaded!")
     app.run_polling()
