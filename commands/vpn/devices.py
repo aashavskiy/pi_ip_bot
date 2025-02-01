@@ -39,7 +39,8 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
-    subprocess.run(["sudo", "/path/to/helper_script.sh", "add", username, device_name])
+    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
+    subprocess.run(["sudo", script_path, "add", username, device_name])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 
@@ -54,7 +55,8 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     if os.path.exists(device_config):
         os.remove(device_config)
         # Use a helper script to remove device from wg0.conf and restart WireGuard
-        subprocess.run(["sudo", "/path/to/helper_script.sh", "remove", username, device_name])
+        script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
+        subprocess.run(["sudo", script_path, "remove", username, device_name])
         await update.message.reply_text(f"✅ Device {device_name} removed and WireGuard restarted.")
     else:
         await update.message.reply_text("❌ Device not found.")
