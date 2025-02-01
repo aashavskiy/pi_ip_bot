@@ -7,7 +7,7 @@ from commands.uptime import uptime_command
 import logging
 
 # Define states for the conversation
-DEVICE_NAME = range(1)
+DEVICE_NAME, REMOVE_DEVICE_NAME = range(2)
 
 def get_main_menu():
     return ReplyKeyboardMarkup([
@@ -79,7 +79,8 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "🔑 Get Config":
         await get_config(update, context)
     elif text == "❌ Remove Device":
-        await remove_device(update, context)
+        await update.message.reply_text("Please enter the device name to remove:")
+        return REMOVE_DEVICE_NAME
     elif text == "🔙 Main Menu":
         await menu_command(update, context)
     else:
@@ -91,6 +92,12 @@ async def device_name_handler(update: Update, context: CallbackContext) -> None:
     await add_device(update, context)
     return ConversationHandler.END
 
+async def remove_device_name_handler(update: Update, context: CallbackContext) -> None:
+    device_name = update.message.text.strip()
+    context.args = [device_name]
+    await remove_device(update, context)
+    return ConversationHandler.END
+
 async def cancel(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("Operation cancelled.", reply_markup=get_main_menu())
     return ConversationHandler.END
@@ -99,7 +106,8 @@ def get_conversation_handler():
     return ConversationHandler(
         entry_points=[MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)],
         states={
-            DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, device_name_handler)]
+            DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, device_name_handler)],
+            REMOVE_DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, remove_device_name_handler)]
         },
         fallbacks=[CommandHandler("cancel", cancel)]
     )
