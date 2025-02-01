@@ -16,7 +16,7 @@ validate_config() {
 }
 
 if [ "$ACTION" == "add" ]; then
-    echo -e "\n# ${USERNAME}_${DEVICE_NAME}\n[Peer]\nPublicKey = ${PUBLIC_KEY}\nAllowedIPs = ${DEVICE_IP}" >> $WG_CONFIG_FILE
+    echo -e "\n# ${USERNAME}_${DEVICE_NAME}\n[Peer]\nPublicKey = ${PUBLIC_KEY}\nAllowedIPs = ${DEVICE_IP}/32" >> $WG_CONFIG_FILE
     validate_config
 elif [ "$ACTION" == "remove" ]; then
     sed -i "/# ${USERNAME}_${DEVICE_NAME}/,/^$/d" $WG_CONFIG_FILE

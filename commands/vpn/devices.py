@@ -57,12 +57,12 @@ async def add_device(update: Update, context: CallbackContext) -> None:
 
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     with open(device_config, "w") as f:
-        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
+        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
-    subprocess.run(["sudo", script_path, "add", username, device_name, public_key, f"{device_ip}/32"])
+    subprocess.run(["sudo", script_path, "add", username, device_name, public_key, device_ip])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 
