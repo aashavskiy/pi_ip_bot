@@ -30,7 +30,7 @@ async def vpn_button_handler(update: Update, context):
     await vpn_menu(update, context)
 
 async def start(update: Update, context):
-    await update.message.reply_text("👋 Welcome to Pi IP Bot! Use the menu to select a command.")
+    await update.message.reply_text("👋 Welcome to Pi IP Bot! Use the menu to select a command.", reply_markup=get_main_menu())
     await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
 
 # Setup bot application
