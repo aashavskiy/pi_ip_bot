@@ -1,10 +1,13 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
 from bot_utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 from commands.ip import ip_command
 from commands.uptime import uptime_command
 import logging
+
+# Define states for the conversation
+DEVICE_NAME = range(1)
 
 def get_main_menu():
     return ReplyKeyboardMarkup([
@@ -67,7 +70,8 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "🔐 VPN":
         await vpn_menu(update, context)
     elif text == "➕ Add Device":
-        await add_device(update, context)
+        await update.message.reply_text("Please enter the device name:")
+        return DEVICE_NAME
     elif text == "📋 List Devices":
         await list_devices(update, context)
     elif text == "🔑 Get Config":
@@ -78,3 +82,22 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await menu_command(update, context)
     else:
         await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
+
+async def device_name_handler(update: Update, context: CallbackContext) -> None:
+    device_name = update.message.text.strip()
+    context.args = [device_name]
+    await add_device(update, context)
+    return ConversationHandler.END
+
+async def cancel(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text("Operation cancelled.", reply_markup=get_main_menu())
+    return ConversationHandler.END
+
+def get_conversation_handler():
+    return ConversationHandler(
+        entry_points=[MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)],
+        states={
+            DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, device_name_handler)]
+        },
+        fallbacks=[CommandHandler("cancel", cancel)]
+    )
