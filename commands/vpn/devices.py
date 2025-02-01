@@ -23,7 +23,7 @@ VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
 def get_next_ip():
     # Call a helper script to get the next available IP address
-    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'get_next_ip.sh')
+    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'get_next_ip.sh')
     result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
     return result
 
@@ -64,7 +64,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
-    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
+    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
     subprocess.run(["sudo", script_path, "add", username, device_name, public_key, device_ip])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
@@ -90,7 +90,7 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
                         file.write(line)
         
         # Use a helper script to remove device from wg0.conf and restart WireGuard
-        script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
+        script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
         subprocess.run(["sudo", script_path, "remove", username, device_name])
         await update.message.reply_text(f"✅ Device {device_name} removed and WireGuard restarted.")
     else:
