@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
-from utils import VPN_WHITELIST, add_to_vpn_whitelist
+from bot_utils import VPN_WHITELIST, add_to_vpn_whitelist
 import os
 
 ADMIN_ID = os.getenv("ADMIN_ID")

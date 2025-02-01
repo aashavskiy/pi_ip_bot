@@ -2,7 +2,7 @@ import os
 import subprocess
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import VPN_WHITELIST_FILE, load_whitelist
+from bot_utils import VPN_WHITELIST_FILE, load_whitelist
 from dotenv import load_dotenv
 
 # Load environment variables

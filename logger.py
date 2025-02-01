@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from utils import load_whitelist
+from bot_utils import load_whitelist
 
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 

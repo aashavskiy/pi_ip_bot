@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import add_to_vpn_whitelist
+from bot_utils import add_to_vpn_whitelist
 
 async def handle_vpn_approval(update: Update, context: CallbackContext) -> None:
     """Handles admin approval or denial of VPN requests."""

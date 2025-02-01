@@ -1,7 +1,7 @@
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from utils import add_to_whitelist, is_user_authorized, request_approval, BOT_WHITELIST_FILE, VPN_WHITELIST_FILE
+from bot_utils import add_to_whitelist, is_user_authorized, request_approval, BOT_WHITELIST_FILE, VPN_WHITELIST_FILE
 
 async def handle_approval(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)

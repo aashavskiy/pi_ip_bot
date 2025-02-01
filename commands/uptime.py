@@ -1,7 +1,7 @@
 import subprocess
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import is_user_authorized, request_approval
+from bot_utils import is_user_authorized, request_approval
 from logger import log_request
 
 async def uptime_command(update: Update, context: CallbackContext) -> None:

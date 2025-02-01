@@ -1,6 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext
-from utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
+from bot_utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 from commands.ip import ip_command
 from commands.uptime import uptime_command

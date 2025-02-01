@@ -1,7 +1,7 @@
 import requests
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import is_user_authorized, request_approval
+from bot_utils import is_user_authorized, request_approval
 
 async def ip_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)

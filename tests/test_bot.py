@@ -8,7 +8,7 @@ from telegram.ext import CallbackContext
 # Добавляем корневую директорию проекта в sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-from utils import is_user_authorized, request_approval, add_to_whitelist, BOT_WHITELIST_FILE, VPN_WHITELIST_FILE
+from bot_utils import is_user_authorized, request_approval, add_to_whitelist, BOT_WHITELIST_FILE, VPN_WHITELIST_FILE
 from commands.menu import menu_command, vpn_menu
 from commands.admin import handle_approval_callback
 
