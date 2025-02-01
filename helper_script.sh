@@ -8,7 +8,7 @@ DEVICE_IP=$5
 WG_CONFIG_FILE="/etc/wireguard/wg0.conf"
 
 validate_config() {
-    wg-quick checkconf wg0 2>&1 | tee /tmp/wg_checkconf_output.log
+    wg setconf wg0 $WG_CONFIG_FILE 2>&1 | tee /tmp/wg_checkconf_output.log
     if [ $? -ne 0 ]; then
         echo "Invalid WireGuard configuration. Aborting."
         cat /tmp/wg_checkconf_output.log
