@@ -27,7 +27,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
-    user_id = str(update.message.from_user.id)
+    user_id = str(update.effective_user.id)
     if is_user_in_vpn_whitelist(user_id):
         await update.message.reply_text("🔐 VPN Menu:", reply_markup=get_vpn_menu())
     else:
