@@ -39,6 +39,12 @@ def main():
     app.add_handler(CommandHandler("vpn", vpn_menu))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
 
+    # Register VPN commands
+    app.add_handler(CommandHandler("add_device", add_device))
+    app.add_handler(CommandHandler("list_devices", list_devices))
+    app.add_handler(CommandHandler("get_config", get_config))
+    app.add_handler(CommandHandler("remove_device", remove_device))
+
     print("🤖 Bot is running...")
     app.run_polling()
 
