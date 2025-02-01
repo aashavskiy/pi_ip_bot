@@ -10,6 +10,12 @@ from commands.vpn.devices import add_device, list_devices, get_config, remove_de
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+def get_main_menu():
+    return ReplyKeyboardMarkup([
+        ["/ip", "/uptime"],
+        ["/vpn"]
+    ], resize_keyboard=True, one_time_keyboard=True)
+
 # Function to dynamically load command handlers from the "commands" folder
 def load_commands():
     commands = {}
