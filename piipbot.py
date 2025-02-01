@@ -1,9 +1,9 @@
 import os
 import importlib
 from dotenv import load_dotenv
-from telegram import Update, ReplyKeyboardRemove
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler
+from commands.start import start_command
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 
 # Load environment variables
@@ -35,12 +35,12 @@ def main():
         app.add_handler(CommandHandler(cmd_name, cmd_func))
         print(f"✅ Loaded command: /{cmd_name}")
 
-    # Add menu command and button handler
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("vpn", vpn_menu))
+    # Add start command and button handler
+    app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CallbackQueryHandler(handle_menu_buttons))
 
     # Register VPN commands
+    app.add_handler(CommandHandler("vpn", vpn_menu))
     app.add_handler(CommandHandler("add_device", add_device))
     app.add_handler(CommandHandler("list_devices", list_devices))
     app.add_handler(CommandHandler("get_config", get_config))
@@ -49,16 +49,5 @@ def main():
     print("🤖 Bot is running...")
     app.run_polling()
 
-async def start(update: Update, context):
-    await update.message.reply_text(
-        "👋 Welcome to Pi IP Bot! Use the menu to select a command.",
-        reply_markup=ReplyKeyboardRemove()
-    )
-    await update.message.reply_text(
-        "📍 Main Menu:",
-        reply_markup=get_main_menu()
-    )
-
 if __name__ == "__main__":
     main()
-
