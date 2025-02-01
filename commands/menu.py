@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from utils import is_user_in_vpn_whitelist
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
@@ -7,18 +7,21 @@ from commands.uptime import uptime_command
 
 def get_main_menu():
     keyboard = [
-        [InlineKeyboardButton("Option 1", callback_data='1')],
-        [InlineKeyboardButton("Option 2", callback_data='2')],
-        [InlineKeyboardButton("Option 3", callback_data='3')],
+        [InlineKeyboardButton("IP", callback_data='ip')],
+        [InlineKeyboardButton("Uptime", callback_data='uptime')],
+        [InlineKeyboardButton("VPN", callback_data='vpn')],
     ]
     return InlineKeyboardMarkup(keyboard)
 
 def get_vpn_menu():
-    return ReplyKeyboardMarkup([
-        ["/add_device", "/list_devices"],
-        ["/get_config", "/remove_device"],
-        ["/menu"]
-    ], resize_keyboard=True, one_time_keyboard=True)
+    keyboard = [
+        [InlineKeyboardButton("Add Device", callback_data='add_device')],
+        [InlineKeyboardButton("List Devices", callback_data='list_devices')],
+        [InlineKeyboardButton("Get Config", callback_data='get_config')],
+        [InlineKeyboardButton("Remove Device", callback_data='remove_device')],
+        [InlineKeyboardButton("Back to Menu", callback_data='menu')],
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
@@ -31,27 +34,25 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("❌ You are not authorized for VPN access.")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    text = update.message.text.strip()
-    if text == "/ip":
-        await ip_command(update, context)
-    elif text == "/uptime":
-        await uptime_command(update, context)
-    elif text == "/vpn":
-        await vpn_menu(update, context)
-    elif text == "/add_device":
-        await add_device(update, context)
-    elif text == "/list_devices":
-        await list_devices(update, context)
-    elif text == "/get_config":
-        await get_config(update, context)
-    elif text == "/remove_device":
-        await remove_device(update, context)
-    elif text == "/menu":
-        await menu_command(update, context)
-    elif text == "/start":
-        await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
-    else:
-        await update.message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
+    query = update.callback_query
+    await query.answer()
+    data = query.data
 
-menu_handler = menu_command
-vpn_menu_handler = vpn_menu
+    if data == 'ip':
+        await ip_command(update, context)
+    elif data == 'uptime':
+        await uptime_command(update, context)
+    elif data == 'vpn':
+        await vpn_menu(update, context)
+    elif data == 'add_device':
+        await add_device(update, context)
+    elif data == 'list_devices':
+        await list_devices(update, context)
+    elif data == 'get_config':
+        await get_config(update, context)
+    elif data == 'remove_device':
+        await remove_device(update, context)
+    elif data == 'menu':
+        await menu_command(update, context)
+    else:
+        await query.edit_message_text("❌ Unknown command. Please use the menu or type /help for available commands.")
