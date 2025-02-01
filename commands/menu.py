@@ -12,8 +12,6 @@ def get_main_menu():
     ], resize_keyboard=True, one_time_keyboard=True)
 
 def get_vpn_menu():
-/*************  ✨ Codeium Command ⭐  *************/
-/******  ebe028bf-e325-4b7d-a757-78320764bdd0  *******/
     return ReplyKeyboardMarkup([
         ["/add_device", "/list_devices"],
         ["/get_config", "/remove_device"],
