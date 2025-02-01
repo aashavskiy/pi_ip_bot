@@ -1,3 +1,4 @@
+import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from utils import add_to_whitelist, is_user_authorized, request_approval, BOT_WHITELIST_FILE
@@ -20,6 +21,8 @@ async def handle_approval_callback(update: Update, context: CallbackContext) -> 
     action = data[0]
     user_id = data[1]
     username = data[2]
+
+    logging.info(f"Approval action: {action}, User ID: {user_id}, Username: {username}")
 
     if action == 'approve':
         add_to_whitelist(BOT_WHITELIST_FILE, user_id, username)
