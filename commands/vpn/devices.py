@@ -67,6 +67,16 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     if os.path.exists(device_config):
         os.remove(device_config)
+        
+        # Remove device from whitelist
+        if os.path.exists(VPN_WHITELIST_FILE):
+            with open(VPN_WHITELIST_FILE, "r") as file:
+                lines = file.readlines()
+            with open(VPN_WHITELIST_FILE, "w") as file:
+                for line in lines:
+                    if line.strip() != f"{username} {device_name}":
+                        file.write(line)
+        
         # Use a helper script to remove device from wg0.conf and restart WireGuard
         script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
         subprocess.run(["sudo", script_path, "remove", username, device_name])
