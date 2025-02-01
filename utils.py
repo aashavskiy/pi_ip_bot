@@ -1,4 +1,7 @@
 import os
+from telegram import Bot
+
+ADMIN_ID = os.getenv("ADMIN_ID")
 
 def load_whitelist(filename):
     if not os.path.exists(filename):
@@ -36,3 +39,12 @@ def add_user_to_bot_whitelist(user_id, username=None):
 
 def add_to_vpn_whitelist(user_id, username=None):
     add_to_whitelist(VPN_WHITELIST_FILE, user_id, username)
+
+def is_user_authorized(user_id):
+    authorized_users = load_whitelist("whitelist.txt")
+    return user_id in authorized_users
+
+def request_approval(user_id, username):
+    bot = Bot(token=os.getenv("BOT_TOKEN"))
+    message = f"🚨 Approval request:\nUser ID: {user_id}\nUsername: @{username}"
+    bot.send_message(chat_id=ADMIN_ID, text=message)

@@ -1,6 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext
-from utils import is_user_in_vpn_whitelist
+from utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 from commands.ip import ip_command
 from commands.uptime import uptime_command
@@ -19,6 +19,18 @@ def get_vpn_menu():
     ], resize_keyboard=True, one_time_keyboard=True)
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or "Unknown"
+
+    if not is_user_authorized(user_id):
+        await request_approval(user_id, username)
+        await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
+        return
+
+    await update.message.reply_text(
+        "📍 Main Menu:",
+        reply_markup=ReplyKeyboardRemove()
+    )
     await update.message.reply_text(
         "📍 Main Menu:",
         reply_markup=get_main_menu()
