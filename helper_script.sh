@@ -3,6 +3,7 @@
 ACTION=$1
 USERNAME=$2
 DEVICE_NAME=$3
+PUBLIC_KEY=$4
 WG_CONFIG_FILE="/etc/wireguard/wg0.conf"
 
 validate_config() {
@@ -14,7 +15,7 @@ validate_config() {
 }
 
 if [ "$ACTION" == "add" ]; then
-    echo -e "\n# ${USERNAME}_${DEVICE_NAME}\n[Peer]\nPublicKey = PLACEHOLDER_PUBLIC_KEY\nAllowedIPs = 10.0.0.X/32" >> $WG_CONFIG_FILE
+    echo -e "\n# ${USERNAME}_${DEVICE_NAME}\n[Peer]\nPublicKey = ${PUBLIC_KEY}\nAllowedIPs = 10.0.0.X/32" >> $WG_CONFIG_FILE
     validate_config
 elif [ "$ACTION" == "remove" ]; then
     sed -i "/# ${USERNAME}_${DEVICE_NAME}/,/^$/d" $WG_CONFIG_FILE
@@ -23,3 +24,7 @@ fi
 
 # Restart WireGuard
 systemctl restart wg-quick@wg0
+if [ $? -ne 0 ]; then
+    echo "Failed to restart WireGuard. Check the configuration and try again."
+    exit 1
+fi

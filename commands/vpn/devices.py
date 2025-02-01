@@ -3,6 +3,14 @@ import subprocess
 from telegram import Update
 from telegram.ext import CallbackContext
 from utils import VPN_WHITELIST_FILE, load_whitelist
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+SERVER_PUBLIC_KEY = os.getenv("SERVER_PUBLIC_KEY")
+SERVER_IP = os.getenv("SERVER_IP")
 
 def save_whitelist(filename, data):
     with open(filename, "a") as file:
@@ -33,14 +41,19 @@ async def add_device(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("❌ Please specify a device name.")
         return
     device_name = context.args[0]
+
+    # Generate a new key pair for the device
+    private_key = subprocess.check_output(["wg", "genkey"]).strip().decode('utf-8')
+    public_key = subprocess.check_output(["wg", "pubkey"], input=private_key.encode('utf-8')).strip().decode('utf-8')
+
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     with open(device_config, "w") as f:
-        f.write(f"[Interface]\nPrivateKey = PLACEHOLDER\nAddress = 10.0.0.X/24\n\n[Peer]\nPublicKey = SERVER_PUBLIC_KEY\nEndpoint = SERVER_IP:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
+        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = 10.0.0.X/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
-    subprocess.run(["sudo", script_path, "add", username, device_name])
+    subprocess.run(["sudo", script_path, "add", username, device_name, public_key])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 
