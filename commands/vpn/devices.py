@@ -12,6 +12,9 @@ PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 SERVER_PUBLIC_KEY = os.getenv("SERVER_PUBLIC_KEY")
 SERVER_IP = os.getenv("SERVER_IP")
 
+if not SERVER_PUBLIC_KEY:
+    raise ValueError("SERVER_PUBLIC_KEY is not set in the .env file")
+
 def save_whitelist(filename, data):
     with open(filename, "a") as file:
         file.write(data + "\n")
