@@ -62,7 +62,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'helper_script.sh')
-    subprocess.run(["sudo", script_path, "add", username, device_name, public_key, f"{device_ip}/32"])
+    subprocess.run(["sudo", script_path, "add", username, device_name, public_key, device_ip])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 
