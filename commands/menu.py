@@ -4,6 +4,7 @@ from utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 from commands.ip import ip_command
 from commands.uptime import uptime_command
+import logging
 
 def get_main_menu():
     return ReplyKeyboardMarkup([
@@ -38,10 +39,16 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
-    if is_user_in_vpn_whitelist(user_id):
-        await update.message.reply_text("🔐 VPN Menu:", reply_markup=get_vpn_menu())
-    else:
-        await update.message.reply_text("❌ You are not authorized for VPN access.")
+    username = update.message.from_user.username or "Unknown"
+
+    logging.info(f"Checking VPN authorization for user ID: {user_id}, Username: {username}")
+
+    if not is_user_in_vpn_whitelist(user_id):
+        await request_approval(user_id, username)
+        await update.message.reply_text("❌ You are not authorized for VPN access. An approval request has been sent to the admin.")
+        return
+
+    await update.message.reply_text("🔐 VPN Menu:", reply_markup=get_vpn_menu())
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     if update.message:
