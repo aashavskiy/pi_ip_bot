@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu  # Добавлен импорт get_main_menu
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
+from commands.vpn.devices import add_device, list_devices, get_config, remove_device  # Добавлены команды VPN
 
 # Load environment variables
 load_dotenv()
@@ -26,11 +27,11 @@ def load_commands():
     return commands
 
 async def vpn_button_handler(update: Update, context):
-    await vpn_menu(update, context)  # Исправленный вызов функции
+    await vpn_menu(update, context)
 
 async def start(update: Update, context):
     await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
-    await menu_command(update, context)  # Теперь меню вызывается сразу после /start
+    await menu_command(update, context)
 
 # Setup bot application
 app = Application.builder().token(BOT_TOKEN).build()
@@ -41,9 +42,15 @@ for command_name, command_func in commands.items():
     app.add_handler(CommandHandler(command_name, command_func))
     logging.info(f"🔹 Registered command: /{command_name}")
 
+# Добавляем команды VPN
+app.add_handler(CommandHandler("add_device", add_device))
+app.add_handler(CommandHandler("list_devices", list_devices))
+app.add_handler(CommandHandler("get_config", get_config))
+app.add_handler(CommandHandler("remove_device", remove_device))
+
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(handle_menu_buttons))
-app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработчик
+app.add_handler(CommandHandler("vpn", vpn_button_handler))
 
 if __name__ == "__main__":
     logging.info("🤖 piipbot.py is running...")
