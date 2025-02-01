@@ -49,7 +49,22 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     if os.path.exists(device_config):
         os.remove(device_config)
-        await update.message.reply_text(f"✅ Device {device_name} removed.")
+        # Remove device from wg0.conf
+        wg_config_file = "/etc/wireguard/wg0.conf"
+        with open(wg_config_file, "r") as file:
+            lines = file.readlines()
+        with open(wg_config_file, "w") as file:
+            skip = False
+            for line in lines:
+                if line.strip() == f"# {username}_{device_name}":
+                    skip = True
+                elif skip and line.strip() == "":
+                    skip = False
+                elif not skip:
+                    file.write(line)
+        # Restart WireGuard
+        subprocess.run(["sudo", "systemctl", "restart", "wg-quick@wg0"])
+        await update.message.reply_text(f"✅ Device {device_name} removed and WireGuard restarted.")
     else:
         await update.message.reply_text("❌ Device not found.")
 
