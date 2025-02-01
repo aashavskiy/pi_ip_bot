@@ -1,6 +1,7 @@
 import os
 import importlib
 from dotenv import load_dotenv
+from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
