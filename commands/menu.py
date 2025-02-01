@@ -44,7 +44,13 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("❌ You are not authorized for VPN access.")
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    text = update.message.text.strip()
+    if update.message:
+        text = update.message.text.strip()
+    elif update.callback_query:
+        text = update.callback_query.data
+    else:
+        return
+
     if text == "/start":
         await menu_command(update, context)
     elif text == "/ip":
