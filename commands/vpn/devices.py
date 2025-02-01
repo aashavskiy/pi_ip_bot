@@ -11,6 +11,8 @@ def save_whitelist(filename, data):
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
 async def list_devices(update: Update, context):
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or f"User_{user_id}"
     user_devices = []
     if os.path.exists(VPN_WHITELIST_FILE):
         with open(VPN_WHITELIST_FILE, "r") as file:
@@ -19,7 +21,10 @@ async def list_devices(update: Update, context):
                     parts = line.strip().split()
                     if len(parts) > 1:
                         user_devices.append(parts[1])
-    return user_devices
+    if user_devices:
+        await update.message.reply_text(f"📋 Your devices:\n" + "\n".join(user_devices))
+    else:
+        await update.message.reply_text("❌ No devices found.")
 
 async def add_device(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
