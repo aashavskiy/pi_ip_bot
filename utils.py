@@ -1,4 +1,5 @@
 import os
+import logging
 from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 
 ADMIN_ID = os.getenv("ADMIN_ID")
@@ -41,7 +42,8 @@ def add_to_vpn_whitelist(user_id, username=None):
     add_to_whitelist(VPN_WHITELIST_FILE, user_id, username)
 
 def is_user_authorized(user_id):
-    authorized_users = load_whitelist("whitelist.txt")
+    authorized_users = load_whitelist(BOT_WHITELIST_FILE)
+    logging.info(f"Authorized users: {authorized_users}")
     return user_id in authorized_users
 
 async def request_approval(user_id, username):

@@ -1,5 +1,6 @@
 import os
 import importlib
+import logging
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
@@ -7,6 +8,7 @@ from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
+from utils import is_user_authorized, request_approval
 
 # Load environment variables
 load_dotenv()
@@ -62,6 +64,8 @@ def main():
 async def start(update: Update, context):
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "Unknown"
+
+    logging.info(f"Checking authorization for user ID: {user_id}, Username: {username}")
 
     if not is_user_authorized(user_id):
         await request_approval(user_id, username)
