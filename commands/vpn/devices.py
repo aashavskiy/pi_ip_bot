@@ -20,7 +20,8 @@ VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
 def get_next_ip():
     # Call a helper script to get the next available IP address
-    result = subprocess.check_output(["sudo", "/Users/alexanderashavskiy/projects/pi_ip_bot/get_next_ip.sh"]).strip().decode('utf-8')
+    script_path = os.path.join(os.path.dirname(__file__), '..', 'get_next_ip.sh')
+    result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
     return result
 
 async def list_devices(update: Update, context):
