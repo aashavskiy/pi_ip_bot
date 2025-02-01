@@ -2,7 +2,7 @@ import os
 import importlib
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 
@@ -38,7 +38,7 @@ def main():
     # Add menu command and button handler
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("vpn", vpn_menu))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
+    app.add_handler(CallbackQueryHandler(handle_menu_buttons))
 
     # Register VPN commands
     app.add_handler(CommandHandler("add_device", add_device))
