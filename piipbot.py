@@ -55,6 +55,14 @@ def main():
     app.run_polling()
 
 async def start(update: Update, context):
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or "Unknown"
+
+    if not is_user_authorized(user_id):
+        await request_approval(user_id, username)
+        await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
+        return
+
     await update.message.reply_text(
         "👋 Welcome to Pi IP Bot! Use the menu to select a command.",
         reply_markup=ReplyKeyboardRemove()

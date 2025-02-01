@@ -1,13 +1,19 @@
 import subprocess
 from telegram import Update
 from telegram.ext import CallbackContext
+from utils import is_user_authorized, request_approval
 from logger import log_request
 
 async def uptime_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "Unknown"
 
-    await log_request(user_id, username, "/uptime")  # ✅ Now passing all required arguments
+    if not is_user_authorized(user_id):
+        await request_approval(user_id, username)
+        await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
+        return
+
+    await log_request(user_id, username, "/uptime")
 
     try:
         # Get system uptime

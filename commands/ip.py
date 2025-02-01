@@ -1,14 +1,15 @@
 import requests
 from telegram import Update
 from telegram.ext import CallbackContext
-from utils import check_whitelist
+from utils import is_user_authorized, request_approval
 
 async def ip_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or "Unknown"
 
-    # ✅ Check whitelist before responding
-    if not check_whitelist(user_id):
-        await update.message.reply_text("🚫 You are not authorized to use this bot.")
+    if not is_user_authorized(user_id):
+        await request_approval(user_id, username)
+        await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
         return
 
     await update.message.reply_text("📡 Fetching your IP address...")
