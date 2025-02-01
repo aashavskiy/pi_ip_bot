@@ -46,6 +46,8 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await remove_device(update, context)
     elif text == "/menu":
         await menu_command(update, context)
+    elif text == "/start":
+        await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
     else:
         await update.message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
 
