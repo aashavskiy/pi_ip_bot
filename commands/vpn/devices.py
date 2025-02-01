@@ -37,6 +37,15 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     with open(device_config, "w") as f:
         f.write(f"[Interface]\nPrivateKey = PLACEHOLDER\nAddress = 10.0.0.X/24\n\n[Peer]\nPublicKey = SERVER_PUBLIC_KEY\nEndpoint = SERVER_IP:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
+    
+    # Add device to wg0.conf
+    wg_config_file = "/etc/wireguard/wg0.conf"
+    with open(wg_config_file, "a") as file:
+        file.write(f"\n# {username}_{device_name}\n[Peer]\nPublicKey = PLACEHOLDER_PUBLIC_KEY\nAllowedIPs = 10.0.0.X/32\n")
+    
+    # Restart WireGuard
+    subprocess.run(["sudo", "systemctl", "restart", "wg-quick@wg0"])
+    
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 
 async def remove_device(update: Update, context: CallbackContext) -> None:
