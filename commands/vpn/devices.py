@@ -38,13 +38,8 @@ async def add_device(update: Update, context: CallbackContext) -> None:
         f.write(f"[Interface]\nPrivateKey = PLACEHOLDER\nAddress = 10.0.0.X/24\n\n[Peer]\nPublicKey = SERVER_PUBLIC_KEY\nEndpoint = SERVER_IP:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
-    # Add device to wg0.conf
-    wg_config_file = "/etc/wireguard/wg0.conf"
-    with open(wg_config_file, "a") as file:
-        file.write(f"\n# {username}_{device_name}\n[Peer]\nPublicKey = PLACEHOLDER_PUBLIC_KEY\nAllowedIPs = 10.0.0.X/32\n")
-    
-    # Restart WireGuard
-    subprocess.run(["sudo", "systemctl", "restart", "wg-quick@wg0"])
+    # Use a helper script to add device to wg0.conf and restart WireGuard
+    subprocess.run(["sudo", "/path/to/helper_script.sh", "add", username, device_name])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
 
@@ -58,21 +53,8 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     if os.path.exists(device_config):
         os.remove(device_config)
-        # Remove device from wg0.conf
-        wg_config_file = "/etc/wireguard/wg0.conf"
-        with open(wg_config_file, "r") as file:
-            lines = file.readlines()
-        with open(wg_config_file, "w") as file:
-            skip = False
-            for line in lines:
-                if line.strip() == f"# {username}_{device_name}":
-                    skip = True
-                elif skip and line.strip() == "":
-                    skip = False
-                elif not skip:
-                    file.write(line)
-        # Restart WireGuard
-        subprocess.run(["sudo", "systemctl", "restart", "wg-quick@wg0"])
+        # Use a helper script to remove device from wg0.conf and restart WireGuard
+        subprocess.run(["sudo", "/path/to/helper_script.sh", "remove", username, device_name])
         await update.message.reply_text(f"✅ Device {device_name} removed and WireGuard restarted.")
     else:
         await update.message.reply_text("❌ Device not found.")
