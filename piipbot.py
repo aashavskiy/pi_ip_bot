@@ -1,20 +1,14 @@
 import os
 import importlib
 from dotenv import load_dotenv
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 
 # Load environment variables
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-def get_main_menu():
-    return ReplyKeyboardMarkup([
-        ["/ip", "/uptime"],
-        ["/vpn"]
-    ], resize_keyboard=True, one_time_keyboard=True)
 
 # Function to dynamically load command handlers from the "commands" folder
 def load_commands():
@@ -56,7 +50,10 @@ def main():
     app.run_polling()
 
 async def start(update: Update, context):
-    await menu_command(update, context)
+    await update.message.reply_text(
+        "👋 Welcome to Pi IP Bot! Use the menu to select a command.",
+        reply_markup=get_main_menu()
+    )
 
 if __name__ == "__main__":
     main()
