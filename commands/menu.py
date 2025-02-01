@@ -21,10 +21,6 @@ def get_vpn_menu():
 async def menu_command(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(
         "📍 Main Menu:",
-        reply_markup=ReplyKeyboardRemove()
-    )
-    await update.message.reply_text(
-        "📍 Main Menu:",
         reply_markup=get_main_menu()
     )
 
