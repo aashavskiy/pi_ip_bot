@@ -30,7 +30,9 @@ async def vpn_menu(update: Update, context: CallbackContext) -> None:
 
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     text = update.message.text.strip()
-    if text == "/ip":
+    if text == "/start":
+        await menu_command(update, context)
+    elif text == "/ip":
         await ip_command(update, context)
     elif text == "/uptime":
         await uptime_command(update, context)
@@ -46,8 +48,6 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
         await remove_device(update, context)
     elif text == "/menu":
         await menu_command(update, context)
-    elif text == "/start":
-        await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
     else:
         await update.message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
 
