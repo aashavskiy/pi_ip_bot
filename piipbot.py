@@ -25,6 +25,12 @@ def load_commands():
     logging.info(f"✅ Loaded commands from {commands_dir}: {', '.join(commands.keys())}")
     return commands
 
+def print_commands(commands):
+    if commands:
+        logging.info(f"📌 Available commands: {', '.join(commands.keys())}")
+    else:
+        logging.warning("⚠️ No commands loaded!")
+
 async def vpn_button_handler(update: Update, context: CallbackContext):
     await vpn_menu(update, context)  # Исправленный вызов функции
 
@@ -47,8 +53,5 @@ app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработ
 
 if __name__ == "__main__":
     logging.info("🤖 piipbot.py is running...")
-    if commands:
-        logging.info(f"📌 Available commands: {', '.join(commands.keys())}")
-    else:
-        logging.warning("⚠️ No commands loaded!")
+    print_commands(commands)
     app.run_polling()
