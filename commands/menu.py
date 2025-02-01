@@ -63,6 +63,8 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     else:
         return
 
+    context.args = text.split()
+
     if text == "🌐 IP":
         await ip_command(update, context)
     elif text == "⏳ Uptime":

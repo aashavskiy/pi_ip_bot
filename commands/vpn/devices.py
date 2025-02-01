@@ -72,7 +72,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
 async def remove_device(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
-    if len(context.args) == 0:
+    if context.args is None or len(context.args) == 0:
         await update.message.reply_text("❌ Please specify a device name to remove.")
         return
     device_name = context.args[0]
