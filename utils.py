@@ -44,7 +44,7 @@ def is_user_authorized(user_id):
     authorized_users = load_whitelist("whitelist.txt")
     return user_id in authorized_users
 
-def request_approval(user_id, username):
+async def request_approval(user_id, username):
     bot = Bot(token=os.getenv("BOT_TOKEN"))
     message = f"🚨 Approval request:\nUser ID: {user_id}\nUsername: @{username}"
-    bot.send_message(chat_id=ADMIN_ID, text=message)
+    await bot.send_message(chat_id=ADMIN_ID, text=message)
