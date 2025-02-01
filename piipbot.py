@@ -30,8 +30,10 @@ async def vpn_button_handler(update: Update, context):
     await vpn_menu(update, context)
 
 async def start(update: Update, context):
-    await update.message.reply_text("👋 Welcome to Pi IP Bot! Use the menu to select a command.", reply_markup=get_main_menu())
-    await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
+    await update.message.reply_text(
+        "👋 Welcome to Pi IP Bot! Use the menu to select a command.",
+        reply_markup=get_main_menu()
+    )
 
 # Setup bot application
 app = Application.builder().token(BOT_TOKEN).build()
@@ -51,6 +53,9 @@ app.add_handler(CommandHandler("remove_device", remove_device))
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(handle_menu_buttons))
 app.add_handler(CommandHandler("vpn", vpn_button_handler))
+
+# Register menu command handler
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons))
 
 if __name__ == "__main__":
     logging.info("🤖 piipbot.py is running...")

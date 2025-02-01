@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from utils import is_user_in_vpn_whitelist
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
@@ -6,10 +6,12 @@ from commands.ip import ip_command
 from commands.uptime import uptime_command
 
 def get_main_menu():
-    return ReplyKeyboardMarkup([
-        ["/ip", "/uptime"],
-        ["/vpn"]
-    ], resize_keyboard=True, one_time_keyboard=True)
+    keyboard = [
+        [InlineKeyboardButton("Option 1", callback_data='1')],
+        [InlineKeyboardButton("Option 2", callback_data='2')],
+        [InlineKeyboardButton("Option 3", callback_data='3')],
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
 def get_vpn_menu():
     return ReplyKeyboardMarkup([
