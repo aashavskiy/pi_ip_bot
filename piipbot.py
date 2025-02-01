@@ -5,9 +5,9 @@ import subprocess
 import importlib
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, CallbackContext
 from commands.admin import handle_approval
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu  # Добавлен импорт get_main_menu
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu  # Удален неиспользуемый импорт get_main_menu
 
 # Load environment variables
 load_dotenv()
@@ -25,10 +25,11 @@ def load_commands():
     logging.info(f"✅ Loaded commands from {commands_dir}: {', '.join(commands.keys())}")
     return commands
 
-async def vpn_button_handler(update: Update, context):
+async def vpn_button_handler(update: Update, context: CallbackContext):
     await vpn_menu(update, context)  # Исправленный вызов функции
 
-async def start(update: Update, context):
+async def start(update: Update, context: CallbackContext):
+    logging.info("🚀 Start command received")
     await menu_command(update, context)
 
 # Setup bot application
