@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext
 from utils import is_user_in_vpn_whitelist
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
@@ -19,7 +19,14 @@ def get_vpn_menu():
     ], resize_keyboard=True, one_time_keyboard=True)
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
+    await update.message.reply_text(
+        "📍 Main Menu:",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await update.message.reply_text(
+        "📍 Main Menu:",
+        reply_markup=get_main_menu()
+    )
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)

@@ -1,7 +1,7 @@
 import os
 import importlib
 from dotenv import load_dotenv
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
@@ -52,6 +52,10 @@ def main():
 async def start(update: Update, context):
     await update.message.reply_text(
         "👋 Welcome to Pi IP Bot! Use the menu to select a command.",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await update.message.reply_text(
+        "📍 Main Menu:",
         reply_markup=get_main_menu()
     )
 
