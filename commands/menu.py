@@ -81,6 +81,10 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "❌ Remove Device":
         await update.message.reply_text("Please enter the device name to remove:")
         return REMOVE_DEVICE_NAME
+    elif text.startswith("remove_device:"):
+        device_name = text.split(":")[1]
+        context.args = [device_name]
+        await remove_device(update, context)
     elif text == "🔙 Main Menu":
         await menu_command(update, context)
     else:
