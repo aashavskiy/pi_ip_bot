@@ -29,7 +29,7 @@ async def vpn_button_handler(update: Update, context):
     await vpn_menu(update, context)  # Исправленный вызов функции
 
 async def start(update: Update, context):
-    await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
+    await menu_command(update, context)
 
 # Setup bot application
 app = Application.builder().token(BOT_TOKEN).build()
