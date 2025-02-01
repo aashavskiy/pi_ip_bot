@@ -18,7 +18,7 @@ if [ -z "$counter" ]; then
 fi
 
 next_ip="10.0.0.$counter"
-echo "$next_ip/24"
+echo "$next_ip"
 
 echo $((counter + 1)) > "$ip_counter_file"
 if [ $? -ne 0 ]; then
