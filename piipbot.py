@@ -35,13 +35,17 @@ async def start(update: Update, context):
 app = Application.builder().token(BOT_TOKEN).build()
 
 # Register handlers
+commands = load_commands()
+for command_name, command_func in commands.items():
+    app.add_handler(CommandHandler(command_name, command_func))
+    logging.info(f"🔹 Registered command: /{command_name}")
+
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CallbackQueryHandler(handle_menu_buttons))
 app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработчик
 
 if __name__ == "__main__":
     logging.info("🤖 piipbot.py is running...")
-    commands = load_commands()  # Загружаем команды и логируем их
     if commands:
         logging.info(f"📌 Available commands: {', '.join(commands.keys())}")
     else:
