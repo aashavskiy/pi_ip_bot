@@ -8,15 +8,15 @@ import logging
 
 def get_main_menu():
     return ReplyKeyboardMarkup([
-        ["/ip", "/uptime"],
-        ["/vpn"]
+        ["🌐 IP", "⏳ Uptime"],
+        ["🔐 VPN"]
     ], resize_keyboard=True, one_time_keyboard=True)
 
 def get_vpn_menu():
     return ReplyKeyboardMarkup([
-        ["/add_device", "/list_devices"],
-        ["/get_config", "/remove_device"],
-        ["/menu"]
+        ["➕ Add Device", "📋 List Devices"],
+        ["🔑 Get Config", "❌ Remove Device"],
+        ["🔙 Main Menu"]
     ], resize_keyboard=True, one_time_keyboard=True)
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
@@ -60,23 +60,21 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     else:
         return
 
-    if text == "/start":
-        await menu_command(update, context)
-    elif text == "/ip":
+    if text == "🌐 IP":
         await ip_command(update, context)
-    elif text == "/uptime":
+    elif text == "⏳ Uptime":
         await uptime_command(update, context)
-    elif text == "/vpn":
+    elif text == "🔐 VPN":
         await vpn_menu(update, context)
-    elif text == "/add_device":
+    elif text == "➕ Add Device":
         await add_device(update, context)
-    elif text == "/list_devices":
+    elif text == "📋 List Devices":
         await list_devices(update, context)
-    elif text == "/get_config":
+    elif text == "🔑 Get Config":
         await get_config(update, context)
-    elif text == "/remove_device":
+    elif text == "❌ Remove Device":
         await remove_device(update, context)
-    elif text == "/menu":
+    elif text == "🔙 Main Menu":
         await menu_command(update, context)
     else:
         await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
