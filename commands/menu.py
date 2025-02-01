@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
 from bot_utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device

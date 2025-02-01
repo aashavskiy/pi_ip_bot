@@ -1,6 +1,6 @@
 import os
 import subprocess
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from bot_utils import VPN_WHITELIST_FILE, load_whitelist
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ def get_next_ip():
     result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
     return result
 
-async def list_devices(update: Update, context):
+async def list_devices(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
     user_devices = []
@@ -39,7 +39,9 @@ async def list_devices(update: Update, context):
                     if len(parts) > 1:
                         user_devices.append(parts[1])
     if user_devices:
-        await update.message.reply_text(f"📋 Your devices:\n" + "\n".join(user_devices))
+        keyboard = [[InlineKeyboardButton(device, callback_data=f"remove_device:{device}") for device in user_devices]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("📋 Your devices:", reply_markup=reply_markup)
     else:
         await update.message.reply_text("❌ No devices found.")
 

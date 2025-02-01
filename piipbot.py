@@ -48,6 +48,7 @@ def main():
     app.add_handler(get_conversation_handler())
     app.add_handler(CallbackQueryHandler(handle_menu_buttons, pattern='^(?!approve|deny).*$'))
     app.add_handler(CallbackQueryHandler(handle_approval_callback, pattern='^(approve|deny):'))
+    app.add_handler(CallbackQueryHandler(remove_device_name_handler, pattern='^remove_device:'))
 
     # Register VPN commands
     app.add_handler(CommandHandler("vpn", vpn_menu))
