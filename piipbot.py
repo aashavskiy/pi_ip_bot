@@ -6,8 +6,7 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval
-from commands.menu import menu_command, handle_menu_buttons  # Ensure menu functions are imported
-from commands import menu as vpn_menu  # Import VPN menu
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu  # Исправленный импорт
 
 # Load environment variables
 load_dotenv()
@@ -24,24 +23,20 @@ def load_commands():
                 commands[filename[:-3]] = getattr(module, f"{filename[:-3]}_command")
     return commands
 
-async def unknown_command(update: Update, context):
-    await update.message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
+async def vpn_button_handler(update: Update, context):
+    await vpn_menu(update, context)  # Исправленный вызов функции
 
-def main():
-    app = Application.builder().token(BOT_TOKEN).build()
-    commands = load_commands()
-    for cmd_name, cmd_func in commands.items():
-        app.add_handler(CommandHandler(cmd_name, cmd_func))
-        print(f"✅ Loaded command: /{cmd_name}")
-    
-    app.add_handler(CallbackQueryHandler(handle_approval))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown_command))
-    app.add_handler(CommandHandler("menu", menu_command))  # Ensure menu command is available
-    app.add_handler(CommandHandler("vpn", vpn_menu))  # Ensure VPN menu command is available
-    app.add_handler(CallbackQueryHandler(handle_menu_buttons))  # Handle menu button interactions
-    
-    print("🤖 Bot is running...")
-    app.run_polling()
+async def start(update: Update, context):
+    await update.message.reply_text("Welcome to PI IP Bot!")
+
+# Setup bot application
+app = Application.builder().token(BOT_TOKEN).build()
+
+# Register handlers
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CallbackQueryHandler(handle_menu_buttons))
+app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработчик
 
 if __name__ == "__main__":
-    main()
+    logging.info("🤖 Bot is running...")
+    app.run_polling()
