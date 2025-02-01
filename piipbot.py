@@ -68,7 +68,7 @@ async def start(update: Update, context):
     logging.info(f"Checking authorization for user ID: {user_id}, Username: {username}")
 
     if not is_user_authorized(user_id):
-        await request_approval(user_id, username)
+        await request_approval(user_id, username, "bot")
         await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
         return
 

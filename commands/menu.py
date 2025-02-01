@@ -24,7 +24,7 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
     username = update.message.from_user.username or "Unknown"
 
     if not is_user_authorized(user_id):
-        await request_approval(user_id, username)
+        await request_approval(user_id, username, "bot")
         await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
         return
 
