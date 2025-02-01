@@ -8,4 +8,4 @@ async def start_command(update: Update, context: CallbackContext) -> None:
 
     await log_request(user_id, username, "/start")  # ✅ Correctly pass all required arguments
 
-    await update.message.reply_text("👋 Welcome to Pi IP Bot! Use the menu to select a command.")
+    await update.message.reply_text("👋 Welcome to Pi IP Bot! Use the menu to select a command. Chlenotest")
