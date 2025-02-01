@@ -7,3 +7,6 @@ bot_whitelist.txt
 vpn_whitelist.txt
 bot_requests.log
 .DS_Store
+privatekey
+publickey
+report
