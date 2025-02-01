@@ -3,6 +3,8 @@ import importlib
 from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from commands.menu import menu_command, handle_menu_buttons
+from commands.vpn import handle_vpn_approval
+from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 
 # Load environment variables
 load_dotenv()
