@@ -19,18 +19,9 @@ def save_whitelist(filename, data):
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
 
 def get_next_ip():
-    # This function should return the next available IP address in the VPN subnet
-    # For simplicity, we'll use a counter stored in a file
-    ip_counter_file = "/etc/wireguard/ip_counter.txt"
-    if not os.path.exists(ip_counter_file):
-        with open(ip_counter_file, "w") as file:
-            file.write("2")  # Start from .2 to avoid conflicts with the server
-    with open(ip_counter_file, "r") as file:
-        counter = int(file.read().strip())
-    next_ip = f"10.0.0.{counter}"
-    with open(ip_counter_file, "w") as file:
-        file.write(str(counter + 1))
-    return next_ip
+    # Call a helper script to get the next available IP address
+    result = subprocess.check_output(["sudo", "/path/to/get_next_ip.sh"]).strip().decode('utf-8')
+    return result
 
 async def list_devices(update: Update, context):
     user_id = str(update.message.from_user.id)
