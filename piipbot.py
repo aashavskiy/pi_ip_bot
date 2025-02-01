@@ -5,9 +5,9 @@ import subprocess
 import importlib
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu  # Удален неиспользуемый импорт get_main_menu
+from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu  # Добавлен импорт get_main_menu
 
 # Load environment variables
 load_dotenv()
@@ -25,18 +25,12 @@ def load_commands():
     logging.info(f"✅ Loaded commands from {commands_dir}: {', '.join(commands.keys())}")
     return commands
 
-def print_commands(commands):
-    if commands:
-        logging.info(f"📌 Available commands: {', '.join(commands.keys())}")
-    else:
-        logging.warning("⚠️ No commands loaded!")
-
-async def vpn_button_handler(update: Update, context: CallbackContext):
+async def vpn_button_handler(update: Update, context):
     await vpn_menu(update, context)  # Исправленный вызов функции
 
-async def start(update: Update, context: CallbackContext):
-    logging.info("🚀 Start command received")
-    await menu_command(update, context)
+async def start(update: Update, context):
+    await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
+    await menu_command(update, context)  # Теперь меню вызывается сразу после /start
 
 # Setup bot application
 app = Application.builder().token(BOT_TOKEN).build()
@@ -53,5 +47,8 @@ app.add_handler(CommandHandler("vpn", vpn_button_handler))  # VPN обработ
 
 if __name__ == "__main__":
     logging.info("🤖 piipbot.py is running...")
-    print_commands(commands)
+    if commands:
+        logging.info(f"📌 Available commands: {', '.join(commands.keys())}")
+    else:
+        logging.warning("⚠️ No commands loaded!")
     app.run_polling()
