@@ -7,7 +7,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu, get_conversation_handler
-from commands.vpn.devices import add_device, list_devices, get_config, remove_device
+from commands.vpn.devices import add_device, list_devices, get_config, remove_device, show_devices_for_removal
 from bot_utils import is_user_authorized, request_approval
 
 # Load environment variables
@@ -55,7 +55,7 @@ def main():
     app.add_handler(CommandHandler("add_device", add_device))
     app.add_handler(CommandHandler("list_devices", list_devices))
     app.add_handler(CommandHandler("get_config", get_config))
-    app.add_handler(CommandHandler("remove_device", remove_device))
+    app.add_handler(CommandHandler("remove_device", show_devices_for_removal))
 
     # Register approval handler
     app.add_handler(MessageHandler(filters.ALL, handle_approval))

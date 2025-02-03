@@ -126,3 +126,47 @@ async def get_config(update: Update, context: CallbackContext) -> None:
     else:
         logging.error(f"Device config not found: {device_config}")
         await update.message.reply_text("❌ Configuration file not found.")
+
+async def show_devices_for_removal(update: Update, context):
+    user_id = str(update.message.from_user.id)
+    if not is_user_authorized(user_id):
+        await update.message.reply_text("🚫 You are not authorized to use this command.")
+        return
+
+    devices = list_devices()  # Assuming list_devices returns a list of device names
+    if not devices:
+        await update.message.reply_text("No devices found.")
+        return
+
+    keyboard = [[InlineKeyboardButton(device, callback_data=f"remove_device:{device}") for device in devices]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text("Select a device to remove:", reply_markup=reply_markup)
+
+async def remove_device(update: Update, context):
+    query = update.callback_query
+    device_name = query.data.split(":")[1]
+    user_id = str(query.from_user.id)
+    username = query.from_user.username or f"User_{user_id}"
+    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    
+    logging.info(f"Removing device with name: {formatted_device_name}")
+    device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
+    logging.info(f"Device config path: {device_config}")
+    
+    if os.path.exists(device_config):
+        os.remove(device_config)
+        
+        # Remove device from device list
+        device_list_file = get_device_list_file(username)
+        save_device_list(device_list_file, username, formatted_device_name, remove=True)
+        
+        # Use a helper script to remove device from wg0.conf and restart WireGuard
+        script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
+        subprocess.run(["sudo", script_path, "remove", username, formatted_device_name])
+        await query.answer()
+        await query.edit_message_text(text=f"✅ Device {formatted_device_name} removed and WireGuard restarted.")
+    else:
+        logging.error(f"Device config not found: {device_config}")
+        await query.answer()
+        await query.edit_message_text(text="❌ Device not found.")
