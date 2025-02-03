@@ -114,3 +114,19 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     subprocess.run(["sudo", script_path, "add", username, formatted_device_name, public_key, device_ip])
     
     await update.message.reply_document(open(device_config, "rb"), filename=f"{formatted_device_name}.conf")
+
+async def get_config(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or f"User_{user_id}"
+    if len(context.args) == 0:
+        await update.message.reply_text("❌ Please specify a device name.")
+        return
+    device_name = context.args[0]
+    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
+    logging.info(f"Device config path: {device_config}")
+    if os.path.exists(device_config):
+        await update.message.reply_document(open(device_config, "rb"), filename=f"{formatted_device_name}.conf")
+    else:
+        logging.error(f"Device config not found: {device_config}")
+        await update.message.reply_text("❌ Configuration file not found.")
