@@ -81,21 +81,24 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
         user_id = str(update.message.from_user.id)
         username = update.message.from_user.username or f"User_{user_id}"
         reply_func = update.message.reply_text
+        device_name = context.args[0] if context.args else None
     elif update.callback_query:
         user_id = str(update.callback_query.from_user.id)
         username = update.callback_query.from_user.username or f"User_{user_id}"
         reply_func = update.callback_query.message.reply_text
+        device_name = update.callback_query.data.split(":")[1]
     else:
         return
 
-    if context.args is None or len(context.args) == 0:
+    if not device_name:
         await reply_func("❌ Please specify a device name to remove.")
         return
-    device_name = context.args[0]
+
     formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
     logging.info(f"Removing device with name: {formatted_device_name}")
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
     logging.info(f"Device config path: {device_config}")
+    
     if os.path.exists(device_config):
         os.remove(device_config)
         
@@ -151,7 +154,12 @@ async def remove_device(update: Update, context):
     device_name = query.data.split(":")[1]
     user_id = str(query.from_user.id)
     username = query.from_user.username or f"User_{user_id}"
-    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    
+    # Ensure the device name is correctly formatted
+    if not device_name.startswith(f"{username}_"):
+        device_name = f"{username}_{device_name}"
+    
+    formatted_device_name = f"{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
     
     logging.info(f"Removing device with name: {formatted_device_name}")
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
