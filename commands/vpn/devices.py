@@ -133,7 +133,10 @@ async def show_devices_for_removal(update: Update, context):
         await update.message.reply_text("🚫 You are not authorized to use this command.")
         return
 
-    devices = list_devices()  # Assuming list_devices returns a list of device names
+    username = update.message.from_user.username or f"User_{user_id}"
+    device_list_file = get_device_list_file(username)
+    devices = load_device_list(device_list_file, username)
+    
     if not devices:
         await update.message.reply_text("No devices found.")
         return
