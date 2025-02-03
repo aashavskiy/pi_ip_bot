@@ -3,7 +3,7 @@ import subprocess
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from bot_utils import VPN_WHITELIST_FILE, load_whitelist
+from bot_utils import VPN_WHITELIST_FILE, load_whitelist, save_device_list, load_device_list
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,6 +17,8 @@ SERVER_COUNTRY = os.getenv("SERVER_COUNTRY", "unknown")
 
 if not SERVER_PUBLIC_KEY:
     raise ValueError("SERVER_PUBLIC_KEY is not set in the .env file")
+
+DEVICE_LIST_FILE = "device_list.txt"
 
 def save_whitelist(filename, data):
     with open(filename, "a") as file:
@@ -33,14 +35,7 @@ def get_next_ip():
 async def list_devices(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
-    user_devices = []
-    if os.path.exists(VPN_WHITELIST_FILE):
-        with open(VPN_WHITELIST_FILE, "r") as file:
-            for line in file:
-                if line.startswith(username):
-                    parts = line.strip().split()
-                    if len(parts) > 1:
-                        user_devices.append(parts[1])
+    user_devices = load_device_list(DEVICE_LIST_FILE, username)
     if user_devices:
         keyboard = [[InlineKeyboardButton(f"Delete {device}", callback_data=f"remove_device:{device}") for device in user_devices]]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -69,6 +64,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     with open(device_config, "w") as f:
         f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {formatted_device_name}")
+    save_device_list(DEVICE_LIST_FILE, username, formatted_device_name)
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
@@ -106,6 +102,9 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
                 for line in lines:
                     if line.strip() != f"{username} {formatted_device_name}":
                         file.write(line)
+        
+        # Remove device from device list
+        save_device_list(DEVICE_LIST_FILE, username, formatted_device_name, remove=True)
         
         # Use a helper script to remove device from wg0.conf and restart WireGuard
         script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
