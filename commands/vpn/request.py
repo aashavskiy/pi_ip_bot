@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
-from bot_utils import VPN_WHITELIST, add_to_vpn_whitelist
+from bot_utils import add_to_vpn_whitelist
 import os
 
 ADMIN_ID = os.getenv("ADMIN_ID")
@@ -10,9 +10,8 @@ async def request_vpn(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
 
-    if user_id in VPN_WHITELIST:
-        await update.message.reply_text("✅ You already have VPN access.")
-        return
+    # Пример использования add_to_vpn_whitelist
+    add_to_vpn_whitelist(user_id, username)
 
     keyboard = [
         [InlineKeyboardButton("✅ Approve", callback_data=f"vpn_approve_{user_id}_{username}")],
