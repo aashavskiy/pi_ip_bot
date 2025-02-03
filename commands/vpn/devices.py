@@ -57,7 +57,7 @@ async def list_devices(update: Update, context: CallbackContext) -> None:
                     if len(parts) > 1:
                         user_devices.append(parts[1])
     if user_devices:
-        keyboard = [[InlineKeyboardButton(device, callback_data=f"remove_device:{device}") for device in user_devices]]
+        keyboard = [[InlineKeyboardButton(f"Delete {device}", callback_data=f"remove_device:{device}") for device in user_devices]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("📋 Your devices:", reply_markup=reply_markup)
     else:
