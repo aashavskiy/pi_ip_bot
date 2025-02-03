@@ -3,7 +3,7 @@ import importlib
 import logging
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardRemove
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler, CallbackContext
 from telegram.error import TelegramError, Conflict, NetworkError
 from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
