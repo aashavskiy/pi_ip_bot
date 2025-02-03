@@ -1,5 +1,6 @@
 import os
 import subprocess
+import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from bot_utils import VPN_WHITELIST_FILE, load_whitelist
@@ -63,6 +64,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     device_ip = get_next_ip()
 
     formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    logging.info(f"Adding device with name: {formatted_device_name}")
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
     with open(device_config, "w") as f:
         f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
@@ -91,6 +93,7 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
         return
     device_name = context.args[0]
     formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    logging.info(f"Removing device with name: {formatted_device_name}")
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
     if os.path.exists(device_config):
         os.remove(device_config)
@@ -109,6 +112,7 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
         subprocess.run(["sudo", script_path, "remove", username, formatted_device_name])
         await reply_func(f"✅ Device {formatted_device_name} removed and WireGuard restarted.")
     else:
+        logging.error(f"Device config not found: {device_config}")
         await reply_func("❌ Device not found.")
 
 async def get_config(update: Update, context: CallbackContext) -> None:
