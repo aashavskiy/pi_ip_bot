@@ -26,6 +26,7 @@ def check_whitelist(user_id):
 
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 VPN_WHITELIST_FILE = "vpn_whitelist.txt"
+DEVICE_LIST_FILE = "device_list.txt"
 
 VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)
 
@@ -60,3 +61,27 @@ async def request_approval(user_id, username, approval_type):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await bot.send_message(chat_id=admin_id, text=message, reply_markup=reply_markup)
+
+def save_device_list(filename, username, device_name, remove=False):
+    if not os.path.exists(filename):
+        open(filename, 'w').close()
+    with open(filename, "r") as f:
+        lines = f.readlines()
+    with open(filename, "w") as f:
+        for line in lines:
+            if line.strip() != f"{username} {device_name}":
+                f.write(line)
+        if not remove:
+            f.write(f"{username} {device_name}\n")
+
+def load_device_list(filename, username):
+    if not os.path.exists(filename):
+        return []
+    devices = []
+    with open(filename, "r") as f:
+        for line in f:
+            if line.startswith(username):
+                parts = line.strip().split()
+                if len(parts) > 1:
+                    devices.append(parts[1])
+    return devices

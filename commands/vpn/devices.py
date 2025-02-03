@@ -3,7 +3,7 @@ import subprocess
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from bot_utils import VPN_WHITELIST_FILE, load_whitelist, save_device_list, load_device_list
+from bot_utils import VPN_WHITELIST_FILE, save_device_list, load_device_list
 from dotenv import load_dotenv
 
 # Load environment variables
