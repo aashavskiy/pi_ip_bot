@@ -27,6 +27,20 @@ def get_next_ip():
     result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
     return result
 
+def save_device_list(filename, username, device_name, remove=False):
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    if remove:
+        with open(filename, "r") as file:
+            lines = file.readlines()
+        with open(filename, "w") as file:
+            for line in lines:
+                if line.strip() != f"{username}_{device_name}":
+                    file.write(line)
+    else:
+        with open(filename, "a") as file:
+            file.write(f"{username}_{device_name}\n")
+
 async def list_devices(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
