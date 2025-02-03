@@ -61,6 +61,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
     logging.info(f"Adding device with name: {formatted_device_name}")
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
+    logging.info(f"Device config path: {device_config}")
     with open(device_config, "w") as f:
         f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {formatted_device_name}")
@@ -91,6 +92,7 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
     logging.info(f"Removing device with name: {formatted_device_name}")
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
+    logging.info(f"Device config path: {device_config}")
     if os.path.exists(device_config):
         os.remove(device_config)
         
@@ -123,7 +125,9 @@ async def get_config(update: Update, context: CallbackContext) -> None:
     device_name = context.args[0]
     formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
     device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
+    logging.info(f"Device config path: {device_config}")
     if os.path.exists(device_config):
         await update.message.reply_document(open(device_config, "rb"), filename=f"{formatted_device_name}.conf")
     else:
+        logging.error(f"Device config not found: {device_config}")
         await update.message.reply_text("❌ Configuration file not found.")
