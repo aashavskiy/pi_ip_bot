@@ -4,6 +4,7 @@ import logging
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
+from telegram.error import TelegramError, Conflict, NetworkError
 from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
 from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu, get_conversation_handler
@@ -60,6 +61,9 @@ def main():
     # Register approval handler
     app.add_handler(MessageHandler(filters.ALL, handle_approval))
 
+    # Register error handler
+    app.add_error_handler(error_handler)
+
     print("🤖 Bot is running...")
     app.run_polling()
 
@@ -82,6 +86,14 @@ async def start(update: Update, context):
         "📍 Main Menu:",
         reply_markup=get_main_menu()
     )
+
+async def error_handler(update: Update, context: CallbackContext) -> None:
+    """Log the error and send a message to the user."""
+    logging.error(msg="Exception while handling an update:", exc_info=context.error)
+    if update.message:
+        await update.message.reply_text("An error occurred. Please try again later.")
+    elif update.callback_query:
+        await update.callback_query.message.reply_text("An error occurred. Please try again later.")
 
 if __name__ == "__main__":
     main()
