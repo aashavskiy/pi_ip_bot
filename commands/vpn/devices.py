@@ -11,6 +11,8 @@ load_dotenv()
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 SERVER_PUBLIC_KEY = os.getenv("SERVER_PUBLIC_KEY")
 SERVER_IP = os.getenv("SERVER_IP")
+BOT_NAME = os.getenv("BOT_NAME", "pi_ip_bot")
+SERVER_COUNTRY = os.getenv("SERVER_COUNTRY", "unknown")
 
 if not SERVER_PUBLIC_KEY:
     raise ValueError("SERVER_PUBLIC_KEY is not set in the .env file")
@@ -60,16 +62,17 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     # Get the next available IP address
     device_ip = get_next_ip()
 
-    device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
+    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
     with open(device_config, "w") as f:
         f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
-    save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
+    save_whitelist(VPN_WHITELIST_FILE, f"{username} {formatted_device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
-    subprocess.run(["sudo", script_path, "add", username, device_name, public_key, device_ip])
+    subprocess.run(["sudo", script_path, "add", username, formatted_device_name, public_key, device_ip])
     
-    await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
+    await update.message.reply_document(open(device_config, "rb"), filename=f"{formatted_device_name}.conf")
 
 async def remove_device(update: Update, context: CallbackContext) -> None:
     if update.message:
@@ -87,7 +90,8 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
         await reply_func("❌ Please specify a device name to remove.")
         return
     device_name = context.args[0]
-    device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
+    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
     if os.path.exists(device_config):
         os.remove(device_config)
         
@@ -97,13 +101,13 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
                 lines = file.readlines()
             with open(VPN_WHITELIST_FILE, "w") as file:
                 for line in lines:
-                    if line.strip() != f"{username} {device_name}":
+                    if line.strip() != f"{username} {formatted_device_name}":
                         file.write(line)
         
         # Use a helper script to remove device from wg0.conf and restart WireGuard
         script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
-        subprocess.run(["sudo", script_path, "remove", username, device_name])
-        await reply_func(f"✅ Device {device_name} removed and WireGuard restarted.")
+        subprocess.run(["sudo", script_path, "remove", username, formatted_device_name])
+        await reply_func(f"✅ Device {formatted_device_name} removed and WireGuard restarted.")
     else:
         await reply_func("❌ Device not found.")
 
@@ -114,8 +118,9 @@ async def get_config(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("❌ Please specify a device name.")
         return
     device_name = context.args[0]
-    device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
+    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
     if os.path.exists(device_config):
-        await update.message.reply_document(open(device_config, "rb"), filename=f"{username}_{device_name}.conf")
+        await update.message.reply_document(open(device_config, "rb"), filename=f"{formatted_device_name}.conf")
     else:
         await update.message.reply_text("❌ Configuration file not found.")
