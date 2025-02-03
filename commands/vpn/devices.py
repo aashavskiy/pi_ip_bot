@@ -19,7 +19,11 @@ def save_whitelist(filename, data):
     with open(filename, "a") as file:
         file.write(data + "\n")
 
+DEVICE_LIST_DIR = "device_lists"
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
+
+def get_device_list_file(username):
+    return os.path.join(DEVICE_LIST_DIR, f"devices.{username}.txt")
 
 def get_next_ip():
     # Call a helper script to get the next available IP address
