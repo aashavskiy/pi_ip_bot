@@ -130,3 +130,22 @@ async def get_config(update: Update, context: CallbackContext) -> None:
     else:
         logging.error(f"Device config not found: {device_config}")
         await update.message.reply_text("❌ Configuration file not found.")
+
+async def show_devices_for_removal(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    if not is_user_authorized(user_id):
+        await update.message.reply_text("🚫 You are not authorized to use this command.")
+        return
+
+    username = update.message.from_user.username or f"User_{user_id}"
+    device_list_file = get_device_list_file(username)
+    devices = load_device_list(device_list_file, username)
+    
+    if not devices:
+        await update.message.reply_text("No devices found.")
+        return
+
+    keyboard = [[InlineKeyboardButton(device, callback_data=f"remove_device:{device}") for device in devices]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text("Select a device to remove:", reply_markup=reply_markup)
