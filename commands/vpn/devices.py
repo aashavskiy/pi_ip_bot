@@ -84,3 +84,33 @@ async def remove_device(update: Update, context: CallbackContext) -> None:
     else:
         logging.error(f"Device config not found: {device_config}")
         await reply_func("\u274c Device not found.")
+
+async def add_device(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.message.from_user.id)
+    username = update.message.from_user.username or f"User_{user_id}"
+    if len(context.args) == 0:
+        await update.message.reply_text("❌ Please specify a device name.")
+        return
+    device_name = context.args[0]
+
+    # Generate a new key pair for the device
+    private_key = subprocess.check_output(["wg", "genkey"]).strip().decode('utf-8')
+    public_key = subprocess.check_output(["wg", "pubkey"], input=private_key.encode('utf-8')).strip().decode('utf-8')
+
+    # Get the next available IP address
+    device_ip = get_next_ip()
+
+    formatted_device_name = f"{username}_{device_name}_{BOT_NAME}_{SERVER_COUNTRY}"
+    logging.info(f"Adding device with name: {formatted_device_name}")
+    device_config = os.path.join(VPN_CONFIG_DIR, f"{formatted_device_name}.conf")
+    logging.info(f"Device config path: {device_config}")
+    with open(device_config, "w") as f:
+        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
+    device_list_file = get_device_list_file(username)
+    save_device_list(device_list_file, username, formatted_device_name)
+    
+    # Use a helper script to add device to wg0.conf and restart WireGuard
+    script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
+    subprocess.run(["sudo", script_path, "add", username, formatted_device_name, public_key, device_ip])
+    
+    await update.message.reply_document(open(device_config, "rb"), filename=f"{formatted_device_name}.conf")
