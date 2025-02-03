@@ -26,9 +26,7 @@ def check_whitelist(user_id):
 
 BOT_WHITELIST_FILE = "bot_whitelist.txt"
 VPN_WHITELIST_FILE = "vpn_whitelist.txt"
-DEVICE_LIST_FILE = "device_list.txt"
-
-VPN_WHITELIST = load_whitelist(VPN_WHITELIST_FILE)
+DEVICE_LIST_DIR = "device_lists"
 
 def is_user_in_bot_whitelist(user_id):
     return is_user_in_whitelist(BOT_WHITELIST_FILE, user_id)
