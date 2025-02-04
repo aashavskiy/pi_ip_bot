@@ -90,12 +90,14 @@ async def start(update: Update, context):
 async def error_handler(update: Update, context: CallbackContext) -> None:
     """Log the error and send a message to the user."""
     logging.error(msg="Exception while handling an update:", exc_info=context.error)
-    if update and update.message:
-        await update.message.reply_text("An error occurred. Please try again later.")
-    elif update and update.callback_query:
-        await update.callback_query.message.reply_text("An error occurred. Please try again later.")
+    if update:
+        if update.message:
+            await update.message.reply_text("An error occurred. Please try again later.")
+        elif update.callback_query:
+            await update.callback_query.message.reply_text("An error occurred. Please try again later.")
     else:
         logging.error("Update is None, cannot send error message to user.")
+        await context.bot.send_message(chat_id=ADMIN_ID, text="An error occurred but the update is None. Check the logs for more details.")
 
 if __name__ == "__main__":
     main()
