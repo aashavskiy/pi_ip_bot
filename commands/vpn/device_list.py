@@ -18,3 +18,7 @@ def save_device_list(filename, username, device_name, remove=False):
     else:
         with open(filename, "a") as file:
             file.write(f"{username}_{device_name}\n")
+
+def save_whitelist(filename, data):
+    with open(filename, "a") as file:
+        file.write(data + "\n")
