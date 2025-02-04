@@ -4,6 +4,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from bot_utils import VPN_WHITELIST_FILE, load_whitelist
 from dotenv import load_dotenv
+from .device_list import save_device_list, get_device_list_file
 
 # Load environment variables
 load_dotenv()
@@ -15,35 +16,14 @@ SERVER_IP = os.getenv("SERVER_IP")
 if not SERVER_PUBLIC_KEY:
     raise ValueError("SERVER_PUBLIC_KEY is not set in the .env file")
 
-def save_whitelist(filename, data):
-    with open(filename, "a") as file:
-        file.write(data + "\n")
-
 DEVICE_LIST_DIR = "device_lists"
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
-
-def get_device_list_file(username):
-    return os.path.join(DEVICE_LIST_DIR, f"devices.{username}.txt")
 
 def get_next_ip():
     # Call a helper script to get the next available IP address
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'get_next_ip.sh')
     result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
     return result
-
-def save_device_list(filename, username, device_name, remove=False):
-    # Ensure the directory exists
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    if remove:
-        with open(filename, "r") as file:
-            lines = file.readlines()
-        with open(filename, "w") as file:
-            for line in lines:
-                if line.strip() != f"{username}_{device_name}":
-                    file.write(line)
-    else:
-        with open(filename, "a") as file:
-            file.write(f"{username}_{device_name}\n")
 
 async def list_devices(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
