@@ -4,7 +4,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from bot_utils import VPN_WHITELIST_FILE, load_whitelist
 from dotenv import load_dotenv
-from .device_list import save_device_list, get_device_list_file
+from .device_list import save_device_list, get_device_list_file, save_whitelist
 
 # Load environment variables
 load_dotenv()
