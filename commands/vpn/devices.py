@@ -2,7 +2,7 @@ import os
 import subprocess
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from bot_utils import VPN_WHITELIST_FILE, load_whitelist
+from bot_utils import VPN_WHITELIST_FILE, load_whitelist, save_whitelist
 from dotenv import load_dotenv
 from .device_list import save_device_list, get_device_list_file
 
