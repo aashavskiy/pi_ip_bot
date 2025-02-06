@@ -18,11 +18,26 @@ if not SERVER_PUBLIC_KEY:
 
 DEVICE_LIST_DIR = "device_lists"
 VPN_CONFIG_DIR = "/etc/wireguard/clients"
+USED_IPS_FILE = "used_ips.txt"
+
+def save_used_ip(ip_address):
+    with open(USED_IPS_FILE, "a") as file:
+        file.write(ip_address + "\n")
+
+def load_used_ips():
+    if not os.path.exists(USED_IPS_FILE):
+        return set()
+    with open(USED_IPS_FILE, "r") as file:
+        return set(line.strip() for line in file)
 
 def get_next_ip():
     # Call a helper script to get the next available IP address
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'get_next_ip.sh')
     result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
+    used_ips = load_used_ips()
+    while result in used_ips:
+        result = subprocess.check_output(["sudo", script_path]).strip().decode('utf-8')
+    save_used_ip(result)
     return result
 
 async def list_devices(update: Update, context: CallbackContext) -> None:
@@ -60,8 +75,8 @@ async def add_device(update: Update, context: CallbackContext) -> None:
 
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     with open(device_config, "w") as f:
-        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
-    save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
+        f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\nDNS = 8.8.8.8\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
+    save_device_list(get_device_list_file(username), username, device_name)
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
     script_path = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts', 'helper_script.sh')
