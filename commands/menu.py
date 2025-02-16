@@ -1,3 +1,5 @@
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/menu.py
+
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
 from bot_utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
@@ -31,13 +33,10 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text("🚫 You are not authorized to use this bot. An approval request has been sent to the admin.")
         return
 
+    # Send only once with the main menu
     await update.message.reply_text(
         "📍 Main Menu:",
-        reply_markup=ReplyKeyboardRemove()
-    )
-    await update.message.reply_text(
-        "📍 Main Menu:",
-        reply_markup=get_main_menu()
+        reply_markup=get_main_menu()  # Send the main menu only once
     )
 
 async def vpn_menu(update: Update, context: CallbackContext) -> None:
