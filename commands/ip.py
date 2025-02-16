@@ -1,14 +1,10 @@
-# File: commands/ip.py
+# commands/ip.py
 
 from telegram import Update
-from telegram.ext import CallbackContext, MessageHandler, filters
-from commands.ip import ip_command
+from telegram.ext import CallbackContext
 
-async def ip_button_handler(update: Update, context: CallbackContext) -> None:
-    """
-    Handles the IP button press
-    """
-    await ip_command(update, context)
+def ip_command(update: Update, context: CallbackContext):
+    update.message.reply_text("IP command executed.")
 
-# Register handler
-ip_handler = MessageHandler(filters.Regex("^🌐 IP$"), ip_button_handler)
+def ip_button_handler(update: Update, context: CallbackContext):
+    update.message.reply_text("IP button pressed.")
