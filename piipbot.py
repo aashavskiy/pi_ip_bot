@@ -11,6 +11,7 @@ from commands.menu import router as menu_router, get_main_menu
 from commands.ip import router as ip_router
 from commands.uptime import router as uptime_router
 from commands.vpn import router as vpn_router
+from commands.buttons import router as buttons_router  # Import buttons handler
 
 # Load environment variables
 load_dotenv()
@@ -30,6 +31,7 @@ dp.include_router(menu_router)
 dp.include_router(ip_router)
 dp.include_router(uptime_router)
 dp.include_router(vpn_router)
+dp.include_router(buttons_router)  # Register buttons handler
 
 # Start command
 @dp.message(Command("start"))
