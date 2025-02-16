@@ -1,23 +1,36 @@
-# File: piipbot.py
+# /Users/alexanderashavskiy/projects/pi_ip_bot/piipbot.py
 
-from telegram.ext import ApplicationBuilder
-from commands.menu import menu_command, get_main_menu, get_conversation_handler
-from commands.buttons import handle_menu_buttons
-from commands.ip import ip_button_handler
-from commands.vpn import vpn_button_handler
-from commands.uptime import uptime_button_handler
-from commands.vpn import router as vpn_router
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
+from aiogram.filters import Command
+import asyncio
 
-# Initialize application
-application = ApplicationBuilder().token("YOUR_BOT_TOKEN").build()
+from commands.menu import router as menu_router
+from commands.ip import router as ip_router
+from commands.uptime import router as uptime_router
+from commands.vpn import get_vpn_router
 
-# Register handlers
-application.add_handler(menu_command)
-application.add_handler(handle_menu_buttons)
-application.add_handler(ip_button_handler)
-application.add_handler(vpn_button_handler)
-application.add_handler(uptime_button_handler)
+# Initialize bot
+TOKEN = "YOUR_BOT_TOKEN_HERE"
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-# Start bot
+# Get VPN router after initialization to avoid circular import
+vpn_router = get_vpn_router()
+
+# Include routers
+dp.include_router(menu_router)
+dp.include_router(ip_router)
+dp.include_router(uptime_router)
+dp.include_router(vpn_router)
+
+# Start command
+@dp.message(Command("start"))
+async def start_command(message: Message):
+    await message.reply("Bot started. Use the menu to interact.")
+
+async def main():
+    await dp.start_polling(bot)
+
 if __name__ == "__main__":
-    application.run_polling()
+    asyncio.run(main())
