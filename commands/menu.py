@@ -1,6 +1,10 @@
-# /Users/alexanderashavskiy/projects/pi_ip_bot/menu.py
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/menu.py
 
+from aiogram import Router
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# Create router instance
+router = Router()
 
 # Define main menu buttons
 main_menu = InlineKeyboardMarkup(inline_keyboard=[
