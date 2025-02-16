@@ -1,12 +1,12 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/menu.py
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.dispatcher.filters import Command
+from aiogram.filters import Command
 from aiogram.types import Message
-from aiogram.dispatcher import Dispatcher
+from aiogram import Router
 
-# Get the current dispatcher instance
-dp = Dispatcher.get_current()
+# Create a router instance
+router = Router()
 
 # Define main menu buttons
 main_menu = ReplyKeyboardMarkup(
@@ -23,7 +23,7 @@ def get_main_menu():
     return main_menu
 
 # Command handler for opening the menu
-@dp.message_handler(Command("menu"))
+@router.message(Command("menu"))
 async def menu_command(message: Message):
     await message.reply("Main menu:", reply_markup=get_main_menu())
 
