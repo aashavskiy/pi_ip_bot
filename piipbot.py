@@ -1,17 +1,27 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/piipbot.py
 
+import os
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
 import asyncio
+from dotenv import load_dotenv
 
 from commands.menu import router as menu_router
 from commands.ip import router as ip_router
 from commands.uptime import router as uptime_router
 from commands.vpn import get_vpn_router
 
+# Load environment variables
+load_dotenv()
+
+# Read the bot token from .env
+TOKEN = os.getenv("BOT_TOKEN")
+
+if not TOKEN:
+    raise ValueError("BOT_TOKEN is missing! Check your .env file.")
+
 # Initialize bot
-TOKEN = "YOUR_BOT_TOKEN_HERE"
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
