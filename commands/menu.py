@@ -1,6 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
-from bot_utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval
+from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters, ApplicationBuilder
+from bot_utils import is_user_in_vpn_whitelist, is_user_authorized, request_approval, dispatcher
 from commands.vpn.devices import add_device, list_devices, get_config, remove_device
 from commands.ip import ip_command
 from commands.uptime import uptime_command
@@ -72,7 +72,11 @@ uptime_button_handler = MessageHandler(filters.Regex("^⏳ Uptime$"), uptime_com
 vpn_button_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_menu)
 handle_menu_buttons_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)
 
+# Ensure dispatcher is available
+if 'dispatcher' not in globals():
+    dispatcher = ApplicationBuilder().token("YOUR_BOT_TOKEN").build().dispatcher
+
 # Add handlers to dispatcher
 dispatcher.add_handler(menu_handler)
 dispatcher.add_handler(handle_menu_buttons_handler)
-dispatcher.add_handler(ip_button_handler)  # Fix for IP button
+dispatcher.add_handler(ip_button_handler)
