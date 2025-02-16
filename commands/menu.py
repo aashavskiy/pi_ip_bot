@@ -43,7 +43,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
 
     if text == "🔐 VPN":
         await vpn_menu(update, context)
-    elif text == "🌐 IP":
+    elif text in ["🌐 IP", "IP"]:
         await ip_command(update, context)
     elif text == "⏳ Uptime":
         await uptime_command(update, context)
