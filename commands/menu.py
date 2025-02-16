@@ -71,3 +71,8 @@ ip_button_handler = MessageHandler(filters.Regex("^🌐 IP$"), ip_command)
 uptime_button_handler = MessageHandler(filters.Regex("^⏳ Uptime$"), uptime_command)
 vpn_button_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_menu)
 handle_menu_buttons_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)
+
+# Add handlers to dispatcher
+dispatcher.add_handler(menu_handler)
+dispatcher.add_handler(handle_menu_buttons_handler)
+dispatcher.add_handler(ip_button_handler)  # Fix for IP button
