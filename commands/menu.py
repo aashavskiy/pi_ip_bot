@@ -1,7 +1,7 @@
 # commands/menu.py
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, filters
-from telegram.ext import ConversationHandler, CommandHandler, MessageHandler
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 
 def menu_command(update, context):
     keyboard = [[InlineKeyboardButton("Option 1", callback_data='1')],
