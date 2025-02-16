@@ -62,6 +62,19 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     else:
         await update.message.reply_text("Unknown command, please use the menu.")
 
+def get_conversation_handler():
+    """
+    Returns the conversation handler for managing menu interactions.
+    """
+    return ConversationHandler(
+        entry_points=[CommandHandler("menu", menu_command)],
+        states={
+            DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_device_command)],
+            REMOVE_DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, remove_device_command)]
+        },
+        fallbacks=[CommandHandler("menu", menu_command)]
+    )
+
 menu_handler = CommandHandler("menu", menu_command)
 vpn_menu_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_menu)
 add_device_handler = MessageHandler(filters.Regex("^➕ Add Device$"), add_device_command)
