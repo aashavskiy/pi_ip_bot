@@ -47,9 +47,25 @@ async def get_config_command(update: Update, context: CallbackContext) -> None:
 async def remove_device_command(update: Update, context: CallbackContext) -> None:
     await remove_device(update, context)
 
+async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
+    """
+    Handles button presses in the main menu.
+    """
+    text = update.message.text
+
+    if text == "🔐 VPN":
+        await vpn_menu(update, context)
+    elif text == "🌐 IP":
+        await ip_command(update, context)
+    elif text == "⏳ Uptime":
+        await uptime_command(update, context)
+    else:
+        await update.message.reply_text("Unknown command, please use the menu.")
+
 menu_handler = CommandHandler("menu", menu_command)
 vpn_menu_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_menu)
 add_device_handler = MessageHandler(filters.Regex("^➕ Add Device$"), add_device_command)
 list_devices_handler = MessageHandler(filters.Regex("^📋 List Devices$"), list_devices_command)
 get_config_handler = MessageHandler(filters.Regex("^🔑 Get Config$"), get_config_command)
 remove_device_handler = MessageHandler(filters.Regex("^❌ Remove Device$"), remove_device_command)
+menu_buttons_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)
