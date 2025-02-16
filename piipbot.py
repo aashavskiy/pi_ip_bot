@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from commands.menu import router as menu_router
 from commands.ip import router as ip_router
 from commands.uptime import router as uptime_router
-from commands.vpn import router as vpn_router
+from commands.vpn import get_vpn_router
 
 # Load environment variables
 load_dotenv()
@@ -24,6 +24,9 @@ if not TOKEN:
 # Initialize bot
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
+
+# Get VPN router after initialization to avoid circular import
+vpn_router = get_vpn_router()
 
 # Include routers
 dp.include_router(menu_router)
