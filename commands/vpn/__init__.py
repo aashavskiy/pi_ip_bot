@@ -1,14 +1,5 @@
-from .request import request_vpn
-from .approval import handle_vpn_approval  # ✅ Ensure approval function is properly imported
-from .config import generate_vpn_config
-from .devices import add_device, list_devices, remove_device, get_config
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn/__init__.py
 
-__all__ = [
-    "request_vpn",
-    "handle_vpn_approval",
-    "generate_vpn_config",
-    "add_device",
-    "list_devices",
-    "remove_device",
-    "get_config",
-]
+from .vpn import vpn_button_handler, router
+
+__all__ = ["vpn_button_handler", "router"]
