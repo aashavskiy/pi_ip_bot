@@ -1,4 +1,4 @@
-# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn.py
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn/vpn.py
 
 from aiogram.types import Message
 from aiogram.filters import Command
