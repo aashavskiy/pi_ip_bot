@@ -1,5 +1,5 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn/__init__.py
 
-from .vpn import router  # Only import router to avoid circular imports
+from commands.vpn import router  # Use absolute import
 
 __all__ = ["router"]
