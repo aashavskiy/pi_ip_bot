@@ -70,9 +70,9 @@ def get_conversation_handler():
 
 # Register handlers
 menu_handler = CommandHandler("menu", menu_command)
-ip_button_handler = MessageHandler(filters.Regex("^🌐 IP$"), ip_command)
-uptime_button_handler = MessageHandler(filters.Regex("^⏳ Uptime$"), uptime_command)
-vpn_button_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_menu)
+ip_button_handler = MessageHandler(filters.Regex("^🌐 IP$"), handle_menu_buttons)
+uptime_button_handler = MessageHandler(filters.Regex("^⏳ Uptime$"), handle_menu_buttons)
+vpn_button_handler = MessageHandler(filters.Regex("^🔐 VPN$"), handle_menu_buttons)
 handle_menu_buttons_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)
 
 # Add handlers to application
