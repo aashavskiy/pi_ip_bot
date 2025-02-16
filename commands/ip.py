@@ -20,6 +20,6 @@ async def ip_command(update: Update, context: CallbackContext) -> None:
         ip_data = response.json()
         public_ip = ip_data.get("ip", "Unknown")
 
-        await update.message.reply_text(f"🌐 Your public IP address: `{public_ip}`", parse_mode="Markdown")
+        await update.message.reply_text(f"🌐 Public IP address: `{public_ip}`", parse_mode="Markdown")
     except requests.RequestException:
         await update.message.reply_text("⚠️ Error: Unable to fetch public IP.")
