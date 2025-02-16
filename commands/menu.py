@@ -2,8 +2,12 @@
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-# Определение кнопок главного меню
-main_menu = ReplyKeyboardMarkup(resize_keyboard=True)
-main_menu.add(KeyboardButton("IP"))
-main_menu.add(KeyboardButton("UPTIME"))
-main_menu.add(KeyboardButton("VPN"))
+# Define main menu buttons
+main_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="IP")],
+        [KeyboardButton(text="UPTIME")],
+        [KeyboardButton(text="VPN")]
+    ],
+    resize_keyboard=True
+)
