@@ -1,13 +1,12 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/commands/uptime.py
 
 import subprocess
-from aiogram import types
-from aiogram.dispatcher.filters import Command
 from aiogram.types import Message
-from aiogram.dispatcher import Dispatcher
+from aiogram.filters import Command
+from aiogram import Router
 
-# Get the current dispatcher instance
-dp = Dispatcher.get_current()
+# Create a router instance
+router = Router()
 
 # Function to get system uptime
 def get_system_uptime():
@@ -18,7 +17,7 @@ def get_system_uptime():
         return f"Error retrieving uptime: {e}"
 
 # Handler for the UPTIME command
-@dp.message_handler(Command("UPTIME"))
+@router.message(Command("UPTIME"))
 async def uptime_command_handler(message: Message):
     uptime_info = get_system_uptime()
     await message.reply(f"System uptime: {uptime_info}")
