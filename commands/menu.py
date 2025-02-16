@@ -32,53 +32,41 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 
     await update.message.reply_text("Main Menu:", reply_markup=get_main_menu())
 
-async def vpn_menu(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("VPN Menu:", reply_markup=get_vpn_menu())
+async def uptime_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the Uptime button press"""
+    await uptime_command(update, context)
 
-async def add_device_command(update: Update, context: CallbackContext) -> None:
+async def vpn_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the VPN button press"""
+    await vpn_menu(update, context)
+
+async def add_device_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the Add Device button press"""
     await add_device(update, context)
 
-async def list_devices_command(update: Update, context: CallbackContext) -> None:
+async def list_devices_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the List Devices button press"""
     await list_devices(update, context)
 
-async def get_config_command(update: Update, context: CallbackContext) -> None:
+async def get_config_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the Get Config button press"""
     await get_config(update, context)
 
-async def remove_device_command(update: Update, context: CallbackContext) -> None:
+async def remove_device_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the Remove Device button press"""
     await remove_device(update, context)
 
-async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    """
-    Handles button presses in the main menu.
-    """
-    text = update.message.text
+async def main_menu_button_handler(update: Update, context: CallbackContext) -> None:
+    """Handles the Main Menu button press"""
+    await menu_command(update, context)
 
-    if text == "🔐 VPN":
-        await vpn_menu(update, context)
-    elif text == "🌐 IP":
-        await ip_command(update, context)
-    elif text == "⏳ Uptime":
-        await uptime_command(update, context)
-    else:
-        await update.message.reply_text("Unknown command, please use the menu.")
-
-def get_conversation_handler():
-    """
-    Returns the conversation handler for managing menu interactions.
-    """
-    return ConversationHandler(
-        entry_points=[CommandHandler("menu", menu_command)],
-        states={
-            DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, add_device_command)],
-            REMOVE_DEVICE_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, remove_device_command)]
-        },
-        fallbacks=[CommandHandler("menu", menu_command)]
-    )
-
+# Register handlers
 menu_handler = CommandHandler("menu", menu_command)
-vpn_menu_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_menu)
-add_device_handler = MessageHandler(filters.Regex("^➕ Add Device$"), add_device_command)
-list_devices_handler = MessageHandler(filters.Regex("^📋 List Devices$"), list_devices_command)
-get_config_handler = MessageHandler(filters.Regex("^🔑 Get Config$"), get_config_command)
-remove_device_handler = MessageHandler(filters.Regex("^❌ Remove Device$"), remove_device_command)
-menu_buttons_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu_buttons)
+ip_button_handler = MessageHandler(filters.Regex("^🌐 IP$"), ip_command)
+uptime_button_handler = MessageHandler(filters.Regex("^⏳ Uptime$"), uptime_button_handler)
+vpn_button_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_button_handler)
+add_device_button_handler = MessageHandler(filters.Regex("^➕ Add Device$"), add_device_button_handler)
+list_devices_button_handler = MessageHandler(filters.Regex("^📋 List Devices$"), list_devices_button_handler)
+get_config_button_handler = MessageHandler(filters.Regex("^🔑 Get Config$"), get_config_button_handler)
+remove_device_button_handler = MessageHandler(filters.Regex("^❌ Remove Device$"), remove_device_button_handler)
+main_menu_button_handler = MessageHandler(filters.Regex("^🔙 Main Menu$"), main_menu_button_handler)
