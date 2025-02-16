@@ -1,14 +1,14 @@
-# File: commands/vpn.py
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn.py
 
-from telegram import Update
-from telegram.ext import CallbackContext, MessageHandler, filters
-from commands.vpn.menu import vpn_menu
+from aiogram import types
+from aiogram.dispatcher.filters import Command
+from aiogram.types import Message
+from aiogram.dispatcher import Dispatcher
 
-async def vpn_button_handler(update: Update, context: CallbackContext) -> None:
-    """
-    Handles the VPN button press
-    """
-    await vpn_menu(update, context)
+# Создание диспетчера (предполагается, что бот уже определён где-то в основном файле)
+dp = Dispatcher.get_current()
 
-# Register handler
-vpn_handler = MessageHandler(filters.Regex("^🔐 VPN$"), vpn_button_handler)
+# Обработчик команды VPN
+@dp.message_handler(Command("VPN"))
+async def vpn_command_handler(message: Message):
+    await message.reply("VPN command executed successfully.")
