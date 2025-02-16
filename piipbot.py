@@ -6,6 +6,7 @@ from commands.buttons import handle_menu_buttons
 from commands.ip import ip_button_handler
 from commands.vpn import vpn_button_handler
 from commands.uptime import uptime_button_handler
+from commands.vpn import router as vpn_router
 
 # Initialize application
 application = ApplicationBuilder().token("YOUR_BOT_TOKEN").build()
