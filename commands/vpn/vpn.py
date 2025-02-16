@@ -1,4 +1,4 @@
-# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn/vpn.py
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn.py
 
 from aiogram.types import Message
 from aiogram.filters import Command
@@ -10,4 +10,4 @@ router = Router()
 # Handler for the VPN command
 @router.message(Command("VPN"))
 async def vpn_button_handler(message: Message):
-    await message.reply("VPN command executed successfully.")
+    await message.reply("VPN functionality will be implemented here.")
