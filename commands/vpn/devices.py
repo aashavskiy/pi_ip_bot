@@ -1,3 +1,5 @@
+# /Users/alexanderashavskiy/projects/pi_ip_bot/commands/vpn/devices.py
+
 import os
 import subprocess
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -49,15 +51,21 @@ async def list_devices(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or f"User_{user_id}"
     user_devices = []
+    
     if os.path.exists(VPN_WHITELIST_FILE):
         with open(VPN_WHITELIST_FILE, "r") as file:
             for line in file:
                 if line.startswith(username):
                     parts = line.strip().split()
                     if len(parts) > 1:
-                        user_devices.append(parts[1])
+                        # Add "Remove" to each device name
+                        user_devices.append(parts[1] + " - Remove")
+    
     if user_devices:
-        keyboard = [[InlineKeyboardButton(device, callback_data=f"remove_device:{device}") for device in user_devices]]
+        # Create buttons to remove devices
+        keyboard = [
+            [InlineKeyboardButton(device, callback_data=f"remove_device:{device.split(' - ')[0]}") for device in user_devices]
+        ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text("📋 Your devices:", reply_markup=reply_markup)
     else:
@@ -81,6 +89,7 @@ async def add_device(update: Update, context: CallbackContext) -> None:
     device_config = os.path.join(VPN_CONFIG_DIR, f"{username}_{device_name}.conf")
     with open(device_config, "w") as f:
         f.write(f"[Interface]\nPrivateKey = {private_key}\nAddress = {device_ip}/24\n\n[Peer]\nPublicKey = {SERVER_PUBLIC_KEY}\nEndpoint = {SERVER_IP}:51820\nAllowedIPs = 0.0.0.0/0, ::/0\n")
+
     save_whitelist(VPN_WHITELIST_FILE, f"{username} {device_name}")
     
     # Use a helper script to add device to wg0.conf and restart WireGuard
