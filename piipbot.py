@@ -7,10 +7,10 @@ from aiogram.filters import Command
 import asyncio
 from dotenv import load_dotenv
 
-from commands.menu import router as menu_router
+from commands.menu import router as menu_router, get_main_menu
 from commands.ip import router as ip_router
 from commands.uptime import router as uptime_router
-from commands.vpn import router as vpn_router  # Now correctly imports from `commands/vpn/__init__.py`
+from commands.vpn import router as vpn_router
 
 # Load environment variables
 load_dotenv()
@@ -34,7 +34,7 @@ dp.include_router(vpn_router)
 # Start command
 @dp.message(Command("start"))
 async def start_command(message: Message):
-    await message.reply("Bot started. Use the menu to interact.")
+    await message.reply("Bot started. Use the menu to interact.", reply_markup=get_main_menu())
 
 async def main():
     await dp.start_polling(bot)
