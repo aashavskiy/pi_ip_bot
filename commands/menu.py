@@ -1,7 +1,7 @@
 # commands/menu.py
 
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, Filters
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton, filters
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler
 
 def menu_command(update, context):
     keyboard = [[InlineKeyboardButton("Option 1", callback_data='1')],
@@ -17,7 +17,7 @@ def get_conversation_handler():
     return ConversationHandler(
         entry_points=[CommandHandler('start', menu_command)],
         states={
-            1: [MessageHandler(Filters.text & ~Filters.command, some_handler_function)]
+            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, some_handler_function)]
         },
         fallbacks=[CommandHandler('cancel', cancel_handler)]
     )
