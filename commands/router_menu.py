@@ -15,8 +15,6 @@ ROUTER_IP = os.getenv("ROUTER_IP")
 ROUTER_USERNAME = os.getenv("ROUTER_USERNAME")
 ROUTER_PASSWORD = os.getenv("ROUTER_PASSWORD")
 
-__all__ = ["router_menu_command", "handle_router_buttons"]  # ✅ Ensure these are available for import
-
 # Function to get the router control menu
 def get_router_menu():
     keyboard = [
@@ -27,21 +25,6 @@ def get_router_menu():
         [InlineKeyboardButton("⬅ Back to Main Menu", callback_data="main_menu")]
     ]
     return InlineKeyboardMarkup(keyboard)
-
-# Function to display the router menu
-async def router_menu_command(update: Update, context: CallbackContext) -> None:
-    user_id = str(update.effective_user.id)
-
-    if not is_router_admin(user_id):
-        await update.callback_query.answer()
-        await update.callback_query.message.reply_text("🚫 You are not authorized to access the router menu.")
-        return
-
-    await update.callback_query.answer()  # Acknowledge button press
-    await update.callback_query.message.reply_text(
-        "⚙ Router Control Menu:",
-        reply_markup=get_router_menu()
-    )
 
 # Function to fetch router users
 def fetch_router_users():
