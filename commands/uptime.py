@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 from bot_utils import is_user_authorized, request_approval
 from logger import log_request
-from commands.menu import get_main_menu  # Import the main menu function
+from commands.menu_utils import get_main_menu  # Now imported from the new module
 
 async def uptime_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.effective_user.id)
