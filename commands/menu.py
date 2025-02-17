@@ -1,40 +1,40 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/commands/menu.py
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import CallbackContext
 from commands.ip import ip_command
 from commands.uptime import uptime_command
-from commands.menu_utils import get_main_menu  # ✅ Import from menu_utils.py
-from commands.router_menu import router_menu_command  # ✅ Import directly
+from commands.router_utils import is_router_admin
+from commands.router_menu import router_menu_command  # ✅ Import correctly
 
-__all__ = ["menu_command", "handle_menu_buttons"]  # ✅ Ensure it's available for import
+# Function to generate the main menu
+def get_main_menu(user_id: str):
+    keyboard = [
+        [KeyboardButton("🌐 IP"), KeyboardButton("⏳ Uptime")]
+    ]
 
-# Function to handle menu button presses
-async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    if update.callback_query:
-        text = update.callback_query.data
-        await update.callback_query.answer()
-        message = update.callback_query.message
-        user_id = str(update.effective_user.id)
-    else:
-        return
+    # Add Router Control Menu button **only for whitelisted users**
+    if is_router_admin(user_id):
+        keyboard.append([KeyboardButton("⚙ Router Control")])
 
-    if text == "ip":
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
+
+# Function to handle menu text commands
+async def handle_menu_commands(update: Update, context: CallbackContext) -> None:
+    text = update.message.text.strip()
+    user_id = str(update.message.from_user.id)
+
+    if text == "🌐 IP":
         await ip_command(update, context)
-    elif text == "uptime":
+    elif text == "⏳ Uptime":
         await uptime_command(update, context)
-    elif text == "router_menu":
-        await router_menu_command(update, context)  # ✅ Now correctly imported
+    elif text == "⚙ Router Control":
+        await router_menu_command(update, context)
     else:
-        await message.reply_text("❌ Unknown command.")
-
-    await message.reply_text("📍 Main Menu:", reply_markup=get_main_menu(user_id))
+        await update.message.reply_text("❌ Unknown command. Please use the menu.")
 
 # Command to display the main menu
 async def menu_command(update: Update, context: CallbackContext) -> None:
-    user_id = str(update.message.from_user.id)  # Ensure user ID is a string
+    user_id = str(update.message.from_user.id)
 
-    await update.message.reply_text(
-        "📍 Main Menu:",
-        reply_markup=get_main_menu(user_id)
-    )
+    await update.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu(user_id))
