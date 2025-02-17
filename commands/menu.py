@@ -7,10 +7,7 @@ from commands.uptime import uptime_command  # Import uptime command function
 
 # This function handles buttons pressed in the menu
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    if update.callback_query:
-        text = update.callback_query.data  # Handling inline button press
-        message = update.callback_query.message
-    elif update.message:
+    if update.message:
         text = update.message.text.strip()
         message = update.message
     else:
@@ -29,7 +26,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
 def get_main_menu():
     return ReplyKeyboardMarkup([
         ["🌐 IP", "⏳ Uptime"]
-    ], resize_keyboard=True, one_time_keyboard=True)
+    ], resize_keyboard=True)
 
 async def menu_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
