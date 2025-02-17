@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from commands.router_utils import is_router_admin
+from commands.menu_utils import get_main_menu  # ✅ Now importing menu function properly
+
+__all__ = ["router_menu_command", "handle_router_buttons"]  # ✅ Ensure proper exports
 
 # Load environment variables from .env
 load_dotenv()
@@ -25,6 +28,21 @@ def get_router_menu():
         [InlineKeyboardButton("⬅ Back to Main Menu", callback_data="main_menu")]
     ]
     return InlineKeyboardMarkup(keyboard)
+
+# Function to display the router menu
+async def router_menu_command(update: Update, context: CallbackContext) -> None:
+    user_id = str(update.effective_user.id)
+
+    if not is_router_admin(user_id):
+        await update.callback_query.answer()
+        await update.callback_query.message.reply_text("🚫 You are not authorized to access the router menu.")
+        return
+
+    await update.callback_query.answer()  # Acknowledge button press
+    await update.callback_query.message.reply_text(
+        "⚙ Router Control Menu:",
+        reply_markup=get_router_menu()
+    )
 
 # Function to fetch router users
 def fetch_router_users():
@@ -60,6 +78,5 @@ async def handle_router_buttons(update: Update, context: CallbackContext) -> Non
         users_list = fetch_router_users()
         await query.message.reply_text(users_list)
     elif query.data == "main_menu":
-        from commands.menu import get_main_menu
         user_id = str(update.effective_user.id)
         await query.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu(user_id))
