@@ -16,14 +16,7 @@ ROUTER_USERNAME = os.getenv("ROUTER_USERNAME")
 ROUTER_PASSWORD = os.getenv("ROUTER_PASSWORD")
 
 # Function to get the router control menu
-get_/*************  ✨ Codeium Command ⭐  *************/
-    """
-    Handles access to the router menu.
-
-    If the user is not authorized, sends a "Not authorized" message.
-    Otherwise, sends a message with the router menu buttons.
-    """
-/******  d3cb9806-d703-4b60-a628-f53b753c7387  *******/router_menu():
+def get_router_menu():
     keyboard = [
         [InlineKeyboardButton("🔄 Reboot Router", callback_data="router_reboot")],
         [InlineKeyboardButton("📶 Wi-Fi Settings", callback_data="router_wifi")],
