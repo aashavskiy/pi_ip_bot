@@ -5,11 +5,20 @@ from telegram.ext import CallbackContext
 from commands.ip import ip_command
 from commands.uptime import uptime_command
 
+# Function to generate the inline keyboard menu
+def get_main_menu():
+    keyboard = [
+        [InlineKeyboardButton("🌐 IP", callback_data="ip")],
+        [InlineKeyboardButton("⏳ Uptime", callback_data="uptime")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
 # Function to handle menu button presses
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     if update.callback_query:
         text = update.callback_query.data  # Handle inline button press
         await update.callback_query.answer()  # Acknowledge button press
+        message = update.callback_query.message
     else:
         return
 
@@ -19,15 +28,10 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "uptime":
         await uptime_command(update, context)
     else:
-        await update.callback_query.message.reply_text("❌ Unknown command.")
+        await message.reply_text("❌ Unknown command.")
 
-# Function to generate inline keyboard menu
-def get_main_menu():
-    keyboard = [
-        [InlineKeyboardButton("🌐 IP", callback_data="ip")],
-        [InlineKeyboardButton("⏳ Uptime", callback_data="uptime")]
-    ]
-    return InlineKeyboardMarkup(keyboard)
+    # Show the menu again after the command execution
+    await message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
 
 # Command to display the menu
 async def menu_command(update: Update, context: CallbackContext) -> None:
