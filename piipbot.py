@@ -1,3 +1,5 @@
+# /Users/alexanderashavskiy/projects/pi_ip_bot/piipbot.py
+
 import os
 import importlib
 import logging
@@ -6,8 +8,7 @@ from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
 from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
-from commands.menu import menu_command, handle_menu_buttons, vpn_menu, get_main_menu, get_conversation_handler
-from commands.vpn.devices import add_device, list_devices, get_config, remove_device
+from commands.menu import menu_command, handle_menu_buttons, get_main_menu, get_conversation_handler
 from bot_utils import is_user_authorized, request_approval
 
 # Load environment variables
@@ -44,18 +45,9 @@ def main():
         print(f"✅ Loaded command: /{cmd_name}")
 
     # Add start command and button handler
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(get_conversation_handler())
+    app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CallbackQueryHandler(handle_menu_buttons, pattern='^(?!approve|deny).*$'))
     app.add_handler(CallbackQueryHandler(handle_approval_callback, pattern='^(approve|deny):'))
-    app.add_handler(CallbackQueryHandler(handle_menu_buttons, pattern='^remove_device:'))
-
-    # Register VPN commands
-    app.add_handler(CommandHandler("vpn", vpn_menu))
-    app.add_handler(CommandHandler("add_device", add_device))
-    app.add_handler(CommandHandler("list_devices", list_devices))
-    app.add_handler(CommandHandler("get_config", get_config))
-    app.add_handler(CommandHandler("remove_device", remove_device))
 
     # Register approval handler
     app.add_handler(MessageHandler(filters.ALL, handle_approval))
