@@ -1,9 +1,15 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/commands/menu.py
 
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext
 from commands.ip import ip_command  # Import the ip_command function
 from commands.uptime import uptime_command  # Import uptime command function
+
+# Define a mapping from button text to command functions
+COMMAND_MAPPING = {
+    "🌐 IP": ip_command,
+    "⏳ Uptime": uptime_command,
+}
 
 # This function handles buttons pressed in the menu
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
@@ -13,13 +19,9 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     else:
         return
 
-    context.args = text.split()
-
-    # Check if the button pressed is "IP"
-    if text == "🌐 IP":
-        await ip_command(update, context)  # Trigger ip_command when IP button is pressed
-    elif text == "⏳ Uptime":
-        await uptime_command(update, context)
+    # Check if the button text matches a command
+    if text in COMMAND_MAPPING:
+        await COMMAND_MAPPING[text](update, context)  # Call the mapped function
     else:
         await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
 
