@@ -9,6 +9,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
 from commands.menu import menu_command, handle_menu_buttons, get_main_menu
+from commands.router_menu import handle_router_buttons  # ✅ Added for router menu
 
 # Load environment variables
 load_dotenv()
@@ -46,6 +47,7 @@ def main():
     # Add start command and button handler
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CallbackQueryHandler(handle_menu_buttons, pattern='^(?!approve|deny).*$'))
+    app.add_handler(CallbackQueryHandler(handle_router_buttons, pattern='^router_.*$'))  # ✅ Added for router buttons
     app.add_handler(CallbackQueryHandler(handle_approval_callback, pattern='^(approve|deny):'))
 
     # Register approval handler
