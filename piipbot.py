@@ -5,11 +5,10 @@ import importlib
 import logging
 from dotenv import load_dotenv
 from telegram import Update, ReplyKeyboardRemove
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from commands.admin import handle_approval, handle_approval_callback
 from commands.start import start_command
-from commands.menu import menu_command, handle_menu_buttons, get_main_menu, get_conversation_handler
-from bot_utils import is_user_authorized, request_approval
+from commands.menu import menu_command, handle_menu_buttons, get_main_menu
 
 # Load environment variables
 load_dotenv()
