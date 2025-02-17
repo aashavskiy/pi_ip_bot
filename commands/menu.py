@@ -7,12 +7,12 @@ from commands.uptime import uptime_command  # Import uptime command function
 
 # This function handles buttons pressed in the menu
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    if update.message:
+    if update.callback_query:
+        text = update.callback_query.data  # Handling inline button press
+        message = update.callback_query.message
+    elif update.message:
         text = update.message.text.strip()
         message = update.message
-    elif update.callback_query:
-        text = update.callback_query.data
-        message = update.callback_query.message
     else:
         return
 
@@ -20,7 +20,7 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
 
     # Check if the button pressed is "IP"
     if text == "🌐 IP":
-        await ip_command(update, context)  # This will trigger the ip_command when IP button is pressed
+        await ip_command(update, context)  # Trigger ip_command when IP button is pressed
     elif text == "⏳ Uptime":
         await uptime_command(update, context)
     else:
