@@ -1,14 +1,28 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/commands/menu.py
 
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
-from bot_utils import is_user_authorized, request_approval
-from commands.ip import ip_command
-from commands.uptime import uptime_command
-import logging
+from telegram.ext import CallbackContext
+from commands.ip import ip_command  # Import the ip_command function
+from commands.uptime import uptime_command  # Import uptime command function
 
-# Define states for the conversation
-DEVICE_NAME, REMOVE_DEVICE_NAME = range(2)
+async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
+    if update.message:
+        text = update.message.text.strip()
+        message = update.message
+    elif update.callback_query:
+        text = update.callback_query.data
+        message = update.callback_query.message
+    else:
+        return
+
+    context.args = text.split()
+
+    if text == "🌐 IP":
+        await ip_command(update, context)  # Ensure this calls the correct function for IP
+    elif text == "⏳ Uptime":
+        await uptime_command(update, context)
+    else:
+        await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
 
 def get_main_menu():
     return ReplyKeyboardMarkup([
@@ -28,22 +42,3 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
         "📍 Main Menu:",
         reply_markup=get_main_menu()  # Send the main menu only once
     )
-
-async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    if update.message:
-        text = update.message.text.strip()
-        message = update.message
-    elif update.callback_query:
-        text = update.callback_query.data
-        message = update.callback_query.message
-    else:
-        return
-
-    context.args = text.split()
-
-    if text == "🌐 IP":
-        await ip_command(update, context)
-    elif text == "⏳ Uptime":
-        await uptime_command(update, context)
-    else:
-        await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
