@@ -19,10 +19,12 @@ async def router_menu_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.effective_user.id)
 
     if not is_router_admin(user_id):
-        await update.message.reply_text("🚫 You are not authorized to access the router menu.")
+        await update.callback_query.answer()
+        await update.callback_query.message.reply_text("🚫 You are not authorized to access the router menu.")
         return
 
-    await update.message.reply_text(
+    await update.callback_query.answer()  # Acknowledge button press
+    await update.callback_query.message.reply_text(
         "⚙ Router Control Menu:",
         reply_markup=get_router_menu()
     )
@@ -40,4 +42,5 @@ async def handle_router_buttons(update: Update, context: CallbackContext) -> Non
         await query.message.reply_text("📡 Listing connected devices... (Not yet implemented)")
     elif query.data == "main_menu":
         from commands.menu import get_main_menu
-        await query.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu())
+        user_id = str(update.effective_user.id)
+        await query.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu(user_id))
