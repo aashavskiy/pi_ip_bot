@@ -9,7 +9,10 @@ from commands.router_cli import run_router_command  # ✅ Import SSH CLI functio
 
 load_dotenv()
 
-# Function to get the router control menu
+# ✅ Explicitly expose functions to prevent import issues
+__all__ = ["router_menu_command", "handle_router_buttons"]
+
+# Function to generate the router control menu
 def get_router_menu():
     keyboard = [
         [InlineKeyboardButton("🔄 Reboot Router", callback_data="router_reboot")],
@@ -18,8 +21,25 @@ def get_router_menu():
     ]
     return InlineKeyboardMarkup(keyboard)
 
-# Function to handle router menu button presses
+# ✅ Function to display the router menu
+async def router_menu_command(update: Update, context: CallbackContext) -> None:
+    """Handles opening the router control menu."""
+    query = update.callback_query
+    await query.answer()
+
+    user_id = str(update.effective_user.id)
+    if not is_router_admin(user_id):
+        await query.message.reply_text("🚫 You are not authorized to access the router menu.")
+        return
+
+    await query.message.reply_text(
+        "⚙ Router Control Menu:",
+        reply_markup=get_router_menu()
+    )
+
+# ✅ Function to handle router menu button presses
 async def handle_router_buttons(update: Update, context: CallbackContext) -> None:
+    """Handles button presses inside the router control menu."""
     query = update.callback_query
     await query.answer()
 
@@ -30,6 +50,6 @@ async def handle_router_buttons(update: Update, context: CallbackContext) -> Non
         result = run_router_command("show ip dhcp bindings")  # ✅ Corrected command
         await query.message.reply_text(f"📡 Connected Devices:\n{result}")
     elif query.data == "main_menu":
-        from commands.menu import get_main_menu
+        from commands.menu import get_main_menu  # ✅ Import inside function to avoid circular import
         user_id = str(update.effective_user.id)
         await query.message.reply_text("📍 Main Menu:", reply_markup=get_main_menu(user_id))
