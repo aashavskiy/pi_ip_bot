@@ -10,3 +10,4 @@ bot_requests.log
 privatekey
 publickey
 report
+router_whitelist.txt
