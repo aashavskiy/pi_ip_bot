@@ -6,7 +6,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from commands.ip import ip_command
 from commands.uptime import uptime_command
 from commands.router_utils import is_router_admin
-from commands.router_menu import router_menu_command
+from commands.router_menu import router_menu_command  # ✅ Now correctly defined
 
 # Function to generate the main menu
 def get_main_menu(user_id: str):
@@ -36,17 +36,8 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     elif text == "uptime":
         await uptime_command(update, context)
     elif text == "router_menu":
-        await router_menu_command(update, context)
+        await router_menu_command(update, context)  # ✅ Now correctly implemented
     else:
         await message.reply_text("❌ Unknown command.")
 
     await message.reply_text("📍 Main Menu:", reply_markup=get_main_menu(user_id))
-
-# Command to display the main menu
-async def menu_command(update: Update, context: CallbackContext) -> None:
-    user_id = str(update.message.from_user.id)
-
-    await update.message.reply_text(
-        "📍 Main Menu:",
-        reply_markup=get_main_menu(user_id)
-    )
