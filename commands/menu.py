@@ -5,6 +5,7 @@ from telegram.ext import CallbackContext
 from commands.ip import ip_command  # Import the ip_command function
 from commands.uptime import uptime_command  # Import uptime command function
 
+# This function handles buttons pressed in the menu
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
     if update.message:
         text = update.message.text.strip()
@@ -17,8 +18,9 @@ async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
 
     context.args = text.split()
 
+    # Check if the button pressed is "IP"
     if text == "🌐 IP":
-        await ip_command(update, context)  # Ensure this calls the correct function for IP
+        await ip_command(update, context)  # This will trigger the ip_command when IP button is pressed
     elif text == "⏳ Uptime":
         await uptime_command(update, context)
     else:
