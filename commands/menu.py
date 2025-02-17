@@ -1,35 +1,35 @@
 # /Users/alexanderashavskiy/projects/pi_ip_bot/commands/menu.py
 
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
-from commands.ip import ip_command  # Import the ip_command function
-from commands.uptime import uptime_command  # Import uptime command function
+from commands.ip import ip_command
+from commands.uptime import uptime_command
 
-# Define a mapping from button text to command functions
-COMMAND_MAPPING = {
-    "🌐 IP": ip_command,
-    "⏳ Uptime": uptime_command,
-}
-
-# This function handles buttons pressed in the menu
+# Function to handle menu button presses
 async def handle_menu_buttons(update: Update, context: CallbackContext) -> None:
-    if update.message:
-        text = update.message.text.strip()
-        message = update.message
+    if update.callback_query:
+        text = update.callback_query.data  # Handle inline button press
+        await update.callback_query.answer()  # Acknowledge button press
     else:
         return
 
-    # Check if the button text matches a command
-    if text in COMMAND_MAPPING:
-        await COMMAND_MAPPING[text](update, context)  # Call the mapped function
+    # Match button presses with commands
+    if text == "ip":
+        await ip_command(update, context)
+    elif text == "uptime":
+        await uptime_command(update, context)
     else:
-        await message.reply_text("❌ Unknown command. Please use the menu or type /help for available commands.")
+        await update.callback_query.message.reply_text("❌ Unknown command.")
 
+# Function to generate inline keyboard menu
 def get_main_menu():
-    return ReplyKeyboardMarkup([
-        ["🌐 IP", "⏳ Uptime"]
-    ], resize_keyboard=True)
+    keyboard = [
+        [InlineKeyboardButton("🌐 IP", callback_data="ip")],
+        [InlineKeyboardButton("⏳ Uptime", callback_data="uptime")]
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
+# Command to display the menu
 async def menu_command(update: Update, context: CallbackContext) -> None:
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "Unknown"
@@ -41,5 +41,5 @@ async def menu_command(update: Update, context: CallbackContext) -> None:
 
     await update.message.reply_text(
         "📍 Main Menu:",
-        reply_markup=get_main_menu()  # Send the main menu only once
+        reply_markup=get_main_menu()
     )
